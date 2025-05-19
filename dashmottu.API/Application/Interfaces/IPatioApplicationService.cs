@@ -5,6 +5,6 @@ namespace dashmottu.API.Application.Interfaces
 {
     public interface IPatioApplicationService
     {
-        PatioEntity? AdicionarPatio(PatioCreateDto patio);
+        PatioCreateDto? AdicionarPatio(PatioCreateDto patio);
     }
 }

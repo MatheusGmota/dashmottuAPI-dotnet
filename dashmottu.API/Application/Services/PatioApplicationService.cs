@@ -21,7 +21,7 @@ namespace dashmottu.API.Application.Services
         }
 
 
-        public PatioEntity? AdicionarPatio(PatioCreateDto patioDto)
+        public PatioCreateDto? AdicionarPatio(PatioCreateDto patioDto)
         {
             var login = new LoginEntity { Usuario = patioDto.Login.Usuario, Senha = patioDto.Login.Senha };
             var endereco = new EnderecoEntity { 
@@ -43,7 +43,8 @@ namespace dashmottu.API.Application.Services
                     IdLogin = loginAdicionado.Id, 
                     UrlImgPlanta = patioDto.UrlImgPlanta 
                 };
-                return _repository.Adicionar(patio);
+                var obj = _repository.Adicionar(patio);
+                return new PatioCreateDto { Id = obj.Id, Endereco = patioDto.Endereco, Login = patioDto.Login, UrlImgPlanta = obj.UrlImgPlanta};
             }
             return null;
         }

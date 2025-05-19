@@ -27,7 +27,5 @@ namespace dashmottu.API.Domain.Entities
 
         [Column("ESTADO")]
         public string Estado { get; set; }
-
-        public PatioEntity Patio { get; set; } // Relacionamento 1:1
     }
 }

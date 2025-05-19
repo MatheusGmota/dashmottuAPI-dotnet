@@ -15,7 +15,5 @@ namespace dashmottu.API.Domain.Entities
 
         [Column("SENHA")]
         public string Senha { get; set; } // Deve ser armazenada como HASH (ex: BCrypt)
-
-        public PatioEntity Patio { get; set; } // Relacionamento 1:1 (se aplicável)
     }
 }
