@@ -22,5 +22,20 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             }
             return endereco;
         }
+
+        public EnderecoEntity? Atualizar(EnderecoEntity endereco)
+        {
+            if (endereco != null)
+            {
+                _context.Endereco.Update(endereco);
+                _context.SaveChanges();
+            }
+            return endereco;
+        }
+
+        public EnderecoEntity? ObterPorId(int id)
+        {
+            return _context.Endereco.Find(id);
+        }
     }
 }

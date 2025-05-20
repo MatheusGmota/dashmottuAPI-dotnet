@@ -20,5 +20,18 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
 
             return login;
         }
+
+        public LoginEntity? Atualizar(LoginEntity login)
+        {
+            _context.Login.Update(login);
+            _context.SaveChanges();
+
+            return login;
+        }
+
+        public LoginEntity? ObterPorId(int id)
+        {
+            return _context.Login.Find(id);
+        }
     }
 }

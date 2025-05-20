@@ -2,6 +2,8 @@
 using dashmottu.API.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel;
+using System.Net;
 
 namespace dashmottu.API.Controllers
 { 
@@ -20,22 +22,46 @@ namespace dashmottu.API.Controllers
         [SwaggerOperation(Summary = "Obter todos os pátios")]
         public IActionResult ObterTodos()
         {
-            return Ok();
+            var objModel = _applicationService.ObterTodosPatios();
+
+            if (objModel is not null)
+                return Ok(objModel);
+
+            return BadRequest("Não foi possivel obter os dados");
+
         }
 
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Obter pátio por ID")]
         public IActionResult ObterPorId(int id)
         {
-            return Ok();
+            var objModel = _applicationService.ObterPatioPorId(id);
+
+            if (objModel is not null)
+                return Ok(objModel);
+
+            return BadRequest("Não foi possivel obter os dados");
+
         }
 
         [HttpPost]
-        [SwaggerOperation(Summary = "Criar novo pátio")]
+        [SwaggerOperation(Summary = "Criar novo pátio", Description = "Endpoint que recebe dados para cadastrar novo patio")]
         public IActionResult Criar([FromBody] PatioCreateDto novoPatio)
         {
-            var criado = _applicationService.AdicionarPatio(novoPatio);
-            return Ok(criado);
+            try
+            {
+                var criado = _applicationService.AdicionarPatio(novoPatio);
+                return Created();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    status = HttpStatusCode.BadRequest,
+                    Error = ex.Message
+                });
+            }
+            
         }
 
         [HttpPost("login")]
@@ -49,7 +75,24 @@ namespace dashmottu.API.Controllers
         [SwaggerOperation(Summary = "Atualizar pátio existente")]
         public IActionResult Atualizar(int id, [FromBody] PatioCreateDto patioAtualizado)
         {
-            return Ok();
+            try
+            {
+                var objModel = _applicationService.EditarPatio(id, patioAtualizado);
+
+                if (objModel is not null)
+                    return Ok(objModel);
+
+                return BadRequest("Não foi possivel salvar os dados");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Error = ex.Message,
+                    status = HttpStatusCode.BadRequest,
+                });
+            }
+
         }
 
         [HttpDelete("{id}")]

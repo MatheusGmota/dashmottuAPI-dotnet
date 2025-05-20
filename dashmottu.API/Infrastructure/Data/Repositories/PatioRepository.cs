@@ -1,6 +1,7 @@
 ﻿using dashmottu.API.Infrastructure.Data.AppData;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
+using dashmottu.API.Domain.DTOs;
 
 namespace dashmottu.API.Infrastructure.Data.Repositories
 {
@@ -21,6 +22,24 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
                 _context.SaveChanges();
             }
             return patio;
+        }
+
+        public PatioEntity? Atualizar(PatioEntity patio)
+        {
+            _context.Patio.Update(patio);
+            _context.SaveChanges();
+
+            return patio;
+        }
+
+        public PatioEntity? ObterPorId(int id)
+        {
+            return _context.Patio.Find(id);
+        }
+
+        public IEnumerable<PatioEntity>? ObterTodos()
+        {
+            return _context.Patio.OrderBy(o => o.Id).ToList();
         }
     }
 }
