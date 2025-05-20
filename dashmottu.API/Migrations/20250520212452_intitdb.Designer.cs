@@ -11,7 +11,7 @@ using dashmottu.API.Infrastructure.Data.AppData;
 namespace dashmottu.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250519202111_intitdb")]
+    [Migration("20250520212452_intitdb")]
     partial class intitdb
     {
         /// <inheritdoc />
@@ -83,10 +83,13 @@ namespace dashmottu.API.Migrations
 
                     b.Property<string>("Usuario")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnType("NVARCHAR2(450)")
                         .HasColumnName("USUARIO");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Usuario")
+                        .IsUnique();
 
                     b.ToTable("LOGIN");
                 });

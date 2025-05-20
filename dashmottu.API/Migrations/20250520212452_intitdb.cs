@@ -34,7 +34,7 @@ namespace dashmottu.API.Migrations
                 {
                     ID_LOGIN = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    USUARIO = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
+                    USUARIO = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
                     SENHA = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
                 },
                 constraints: table =>
@@ -56,6 +56,12 @@ namespace dashmottu.API.Migrations
                 {
                     table.PrimaryKey("PK_PATIO", x => x.ID_PATIO);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LOGIN_USUARIO",
+                table: "LOGIN",
+                column: "USUARIO",
+                unique: true);
         }
 
         /// <inheritdoc />

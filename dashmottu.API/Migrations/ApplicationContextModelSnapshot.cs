@@ -80,10 +80,13 @@ namespace dashmottu.API.Migrations
 
                     b.Property<string>("Usuario")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnType("NVARCHAR2(450)")
                         .HasColumnName("USUARIO");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Usuario")
+                        .IsUnique();
 
                     b.ToTable("LOGIN");
                 });

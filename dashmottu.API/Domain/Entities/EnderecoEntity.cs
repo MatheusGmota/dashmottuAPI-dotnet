@@ -10,6 +10,7 @@ namespace dashmottu.API.Domain.Entities
         [Column("ID_ENDERECO")]
         public int Id { get; set; }
 
+        [Required]
         [Column("CEP")]
         public string Cep { get; set; }
 

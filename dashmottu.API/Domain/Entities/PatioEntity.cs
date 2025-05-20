@@ -18,6 +18,7 @@ namespace dashmottu.API.Domain.Entities
         [Column("ID_ENDERECO")]
         public int IdEndereco { get; set; }
 
+        [Required]
         [Column("URL_IMG_PLANTA")]
         public string UrlImgPlanta { get; set; }
     }
