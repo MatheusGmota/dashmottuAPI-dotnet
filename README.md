@@ -20,6 +20,15 @@ No arquivo `appsettings.Development.json` em `appsettings.json`, configure os da
 - Oracle Database acessível
 - Visual Studio 2022 ou VS Code com extensões C#
 
+Verifique se a pasta `Migrations`  existe no seu diretorio, caso não tenha abra o Console Gerenciador de Pacotes e execute os seguintes comandos
+```
+// Gerar a migration caso necessário
+Add-Migration intitdb 
+
+// Atualizar o banco de dados
+Update-Database
+```
+
 ### 🖥️ Com Visual Studio
 - Abra a solução dashmottu.API.sln
 - Defina o projeto dashmottu.API como startup
