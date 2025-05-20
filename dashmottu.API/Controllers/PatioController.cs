@@ -2,7 +2,6 @@
 using dashmottu.API.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel;
 using System.Net;
 
 namespace dashmottu.API.Controllers
@@ -19,7 +18,10 @@ namespace dashmottu.API.Controllers
         }
 
         [HttpGet]
-        [SwaggerOperation(Summary = "Obter todos os pátios")]
+        [SwaggerOperation(
+            Summary = "Obter todos os pátios",
+            Description = "Retorna uma lista com todos os registros de pátios cadastrados no sistema."
+        )]
         public IActionResult ObterTodos()
         {
             var objModel = _applicationService.ObterTodosPatios();
@@ -27,31 +29,58 @@ namespace dashmottu.API.Controllers
             if (objModel is not null)
                 return Ok(objModel);
 
-            return BadRequest("Não foi possivel obter os dados");
+            return NoContent();
 
         }
 
         [HttpGet("{id}")]
-        [SwaggerOperation(Summary = "Obter pátio por ID")]
+        [SwaggerOperation(
+            Summary = "Obter pátio por ID",
+            Description = "Retorna os dados de um pátio específico, com base no ID fornecido."
+        )]
         public IActionResult ObterPorId(int id)
         {
-            var objModel = _applicationService.ObterPatioPorId(id);
+            try
+            {
+                var objModel = _applicationService.ObterPatioPorId(id);
 
-            if (objModel is not null)
-                return Ok(objModel);
+                if (objModel is not null)
+                    return Ok(objModel);
 
-            return BadRequest("Não foi possivel obter os dados");
-
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Error = ex.Message,
+                    status = HttpStatusCode.BadRequest,
+                });
+            }
         }
 
         [HttpPost]
-        [SwaggerOperation(Summary = "Criar novo pátio", Description = "Endpoint que recebe dados para cadastrar novo patio")]
+        [SwaggerOperation(
+            Summary = "Cadastrar um novo pátio",
+            Description = "Cadastra um novo pátio com endereço, imagem da planta e informações de login."
+        )]
         public IActionResult Criar([FromBody] PatioCreateDto novoPatio)
         {
             try
             {
-                var criado = _applicationService.AdicionarPatio(novoPatio);
-                return Created();
+                var objModel = _applicationService.AdicionarPatio(novoPatio);
+                if (objModel is not null)
+                    return CreatedAtAction(
+                        nameof(ObterPorId),
+                        new { id = objModel.Id },
+                        objModel
+                    );
+
+                return BadRequest(new
+                {
+                    status = HttpStatusCode.BadRequest,
+                    Error = "Não foi possivel salvar os dados"
+                });
             }
             catch (Exception ex)
             {
@@ -65,14 +94,28 @@ namespace dashmottu.API.Controllers
         }
 
         [HttpPost("login")]
-        [SwaggerOperation(Summary = "Login de pátio")]
+        [SwaggerOperation(
+            Summary = "Login do pátio",
+            Description = "Realiza o login de um pátio com base nas credenciais fornecidas."
+        )]
         public IActionResult Login([FromBody] LoginDto login)
         {
-            return Ok();
+            var objModel = _applicationService.ValidarLogin(login);
+            if (objModel is not null)
+                return Ok(objModel);
+
+            return BadRequest(new
+            {
+                status = HttpStatusCode.BadRequest,
+                Error = "Login ou senha inválidos"
+            });
         }
 
         [HttpPut("{id}")]
-        [SwaggerOperation(Summary = "Atualizar pátio existente")]
+        [SwaggerOperation(
+            Summary = "Atualizar um pátio",
+            Description = "Atualiza os dados de um pátio existente com base no ID fornecido."
+        )]
         public IActionResult Atualizar(int id, [FromBody] PatioCreateDto patioAtualizado)
         {
             try
@@ -96,10 +139,29 @@ namespace dashmottu.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [SwaggerOperation(Summary = "Excluir pátio por ID")]
+        [SwaggerOperation(
+            Summary = "Remover um pátio",
+            Description = "Remove um pátio do sistema com base no ID fornecido."
+        )]
         public IActionResult Excluir(int id)
         {
-            return Ok();
+            try
+            {
+                var objModel = _applicationService.DeletarPatio(id);
+
+                if (objModel is not null)
+                    return Ok("Objeto deletado com sucesso!");
+
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return BadRequest(new
+                {
+                    status = HttpStatusCode.BadRequest,
+                    Error = "Não foi possivel deletar o objeto"
+                });
+            }
         }
     }
 }

@@ -7,5 +7,6 @@ namespace dashmottu.API.Domain.Interfaces
         EnderecoEntity? Adicionar(EnderecoEntity endereco);
         EnderecoEntity? Atualizar(EnderecoEntity endereco);
         EnderecoEntity? ObterPorId(int id);
+        void Deletar(EnderecoEntity endereco);
     }
 }

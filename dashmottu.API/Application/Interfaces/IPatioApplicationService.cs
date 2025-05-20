@@ -9,5 +9,7 @@ namespace dashmottu.API.Application.Interfaces
         PatioCreateDto? AdicionarPatio(PatioCreateDto patio);
         PatioCreateDto? EditarPatio(int id, PatioCreateDto patioAtualizado);
         PatioCreateDto? ObterPatioPorId(int id);
+        PatioEntity? DeletarPatio(int id);
+        LoginResponseDto ValidarLogin(LoginDto login);
     }
 }

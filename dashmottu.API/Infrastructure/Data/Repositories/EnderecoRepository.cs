@@ -33,6 +33,12 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             return endereco;
         }
 
+        public void Deletar(EnderecoEntity endereco)
+        {
+            _context.Endereco.Remove(endereco);
+            _context.SaveChanges();
+        }
+
         public EnderecoEntity? ObterPorId(int id)
         {
             return _context.Endereco.Find(id);

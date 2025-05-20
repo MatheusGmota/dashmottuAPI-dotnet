@@ -8,6 +8,7 @@ namespace dashmottu.API.Domain.Interfaces
         LoginEntity? Adicionar(LoginEntity login);
         LoginEntity? Atualizar(LoginEntity login);
         LoginEntity? ObterPorId(int id);
+        void Deletar(LoginEntity? login);
 
     }
 }

@@ -10,6 +10,9 @@ namespace dashmottu.API.Domain.Interfaces
         PatioEntity? Atualizar(PatioEntity patio);
 
         IEnumerable<PatioEntity>? ObterTodos();
+
         PatioEntity? ObterPorId(int id);
+
+        void Deletar(PatioEntity patio);
     }
 }

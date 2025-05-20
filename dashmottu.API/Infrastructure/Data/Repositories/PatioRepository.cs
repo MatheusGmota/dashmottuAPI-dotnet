@@ -32,6 +32,12 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             return patio;
         }
 
+        public void Deletar(PatioEntity patio)
+        {
+            _context.Patio.Remove(patio);
+            _context.SaveChanges(); 
+        }
+
         public PatioEntity? ObterPorId(int id)
         {
             return _context.Patio.Find(id);

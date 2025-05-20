@@ -3,6 +3,13 @@
     public class LoginDto
     {
         public string Usuario { get; set; }
-        public string Senha { get; set; } // Será hasheada antes de salvar
+        public string Senha { get; set; }
+    }
+
+    public class LoginResponseDto
+    {
+        public bool IsValid { get; set; }
+        public int? IdPatio { get; set; }
+        public string? Token { get; set; }
     }
 }

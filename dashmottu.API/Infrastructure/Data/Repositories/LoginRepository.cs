@@ -29,6 +29,12 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             return login;
         }
 
+        public void Deletar(LoginEntity? login)
+        {
+            _context.Login.Remove(login);
+            _context.SaveChanges();
+        }
+
         public LoginEntity? ObterPorId(int id)
         {
             return _context.Login.Find(id);
