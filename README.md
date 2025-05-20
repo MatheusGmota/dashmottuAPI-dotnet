@@ -42,6 +42,14 @@ dotnet run
 ```
 A API será iniciada em: https://localhost:7046 ou http://localhost:5046
 
+### 📡 Rotas
+- `GET     /api/patio`             - Retorna uma lista com todos os registros de pátios cadastrados no sistema.  
+- `GET     /api/patio/{id}`        - Retorna os dados de um pátio específico, com base no ID fornecido.  
+- `POST    /api/patio`             - Cadastra um novo pátio com endereço, imagem da planta e informações de login.  
+- `POST    /api/patio/login`       - Realiza o login de um pátio com base nas credenciais fornecidas.  
+- `PUT     /api/patio/{id}`        - Atualiza os dados de um pátio existente com base no ID fornecido.  
+- `DELETE  /api/patio/{id}`        - Remove um pátio do sistema com base no ID fornecido.  
+
 ### 📚 Documentação Interativa
 - Ao executar a API, acesse a documentação Swagger digitando `/swagger` para testar os endpoints diretamente pelo navegador.
 
