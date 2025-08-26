@@ -1,7 +1,9 @@
 ﻿using dashmottu.API.Application.Interfaces;
+using dashmottu.API.Doc.Samples;
 using dashmottu.API.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Net;
 
 namespace dashmottu.API.Controllers
@@ -22,9 +24,12 @@ namespace dashmottu.API.Controllers
             Summary = "Obter todos os pátios",
             Description = "Retorna uma lista com todos os registros de pátios cadastrados no sistema."
         )]
-        public IActionResult ObterTodos()
+        [SwaggerResponse(200, "Lista de pátios retornada com sucesso.", typeof(IEnumerable<PatioCreateDto>))]
+        [SwaggerResponse(204, "Nenhum pátio encontrado.")]
+        [SwaggerResponseExample(statusCode:200, typeof(PatioResponseListSample))]
+        public async Task<IActionResult> ObterTodos()
         {
-            var objModel = _applicationService.ObterTodosPatios();
+            var objModel = await _applicationService.ObterTodosPatios();
 
             if (objModel is not null)
                 return Ok(objModel);
@@ -38,11 +43,11 @@ namespace dashmottu.API.Controllers
             Summary = "Obter pátio por ID",
             Description = "Retorna os dados de um pátio específico, com base no ID fornecido."
         )]
-        public IActionResult ObterPorId(int id)
+        public async Task<IActionResult> ObterPorId(int id)
         {
             try
             {
-                var objModel = _applicationService.ObterPatioPorId(id);
+                var objModel = await _applicationService.ObterPatioPorId(id);
 
                 if (objModel is not null)
                     return Ok(objModel);
@@ -64,11 +69,11 @@ namespace dashmottu.API.Controllers
             Summary = "Cadastrar um novo pátio",
             Description = "Cadastra um novo pátio com endereço, imagem da planta e informações de login."
         )]
-        public IActionResult Criar([FromBody] PatioCreateDto novoPatio)
+        public async Task<IActionResult > Criar([FromBody] PatioCreateDto novoPatio)
         {
             try
             {
-                var objModel = _applicationService.AdicionarPatio(novoPatio);
+                var objModel = await _applicationService.AdicionarPatio(novoPatio);
                 if (objModel is not null)
                     return CreatedAtAction(
                         nameof(ObterPorId),
@@ -98,9 +103,9 @@ namespace dashmottu.API.Controllers
             Summary = "Login do pátio",
             Description = "Realiza o login de um pátio com base nas credenciais fornecidas."
         )]
-        public IActionResult Login([FromBody] LoginDto login)
+        public async Task<IActionResult> Login([FromBody] LoginDto login)
         {
-            var objModel = _applicationService.ValidarLogin(login);
+            var objModel = await _applicationService.ValidarLogin(login);
             if (objModel is not null)
                 return Ok(objModel);
 
@@ -116,11 +121,11 @@ namespace dashmottu.API.Controllers
             Summary = "Atualizar um pátio",
             Description = "Atualiza os dados de um pátio existente com base no ID fornecido."
         )]
-        public IActionResult Atualizar(int id, [FromBody] PatioCreateDto patioAtualizado)
+        public async Task<IActionResult> Atualizar(int id, [FromBody] PatioCreateDto patioAtualizado)
         {
             try
             {
-                var objModel = _applicationService.EditarPatio(id, patioAtualizado);
+                var objModel = await _applicationService.EditarPatio(id, patioAtualizado);
 
                 if (objModel is not null)
                     return Ok(objModel);
@@ -143,11 +148,11 @@ namespace dashmottu.API.Controllers
             Summary = "Remover um pátio",
             Description = "Remove um pátio do sistema com base no ID fornecido."
         )]
-        public IActionResult Excluir(int id)
+        public async Task<IActionResult> Excluir(int id)
         {
             try
             {
-                var objModel = _applicationService.DeletarPatio(id);
+                var objModel = await _applicationService.DeletarPatio(id);
 
                 if (objModel is not null)
                     return Ok("Objeto deletado com sucesso!");

@@ -5,13 +5,13 @@ namespace dashmottu.API.Domain.Interfaces
 {
     public interface IPatioRepository
     {
-        PatioEntity? Adicionar(PatioEntity patio);
+        Task<PatioEntity?> Adicionar(PatioEntity patio);
 
-        PatioEntity? Atualizar(PatioEntity patio);
+        Task<PatioEntity?> Atualizar(PatioEntity patio);
 
-        IEnumerable<PatioEntity>? ObterTodos();
+        Task<IEnumerable<PatioEntity>?> ObterTodos();
 
-        PatioEntity? ObterPorId(int id);
+        Task<PatioEntity?> ObterPorId(int id);
 
         void Deletar(PatioEntity patio);
     }

@@ -2,6 +2,7 @@
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
 using dashmottu.API.Domain.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace dashmottu.API.Infrastructure.Data.Repositories
 {
@@ -14,17 +15,18 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public PatioEntity? Adicionar(PatioEntity patio)
+        public async Task<PatioEntity?> Adicionar(PatioEntity patio)
         {
             if (patio != null)
             {
                 _context.Patio.Add(patio);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+                return patio;
             }
-            return patio;
+            return null;
         }
 
-        public PatioEntity? Atualizar(PatioEntity patio)
+        public async Task<PatioEntity?> Atualizar(PatioEntity patio)
         {
             _context.Patio.Update(patio);
             _context.SaveChanges();
@@ -38,14 +40,14 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             _context.SaveChanges(); 
         }
 
-        public PatioEntity? ObterPorId(int id)
+        public async Task<PatioEntity?> ObterPorId(int id)
         {
-            return _context.Patio.Find(id);
+            return await _context.Patio.FindAsync(id);
         }
 
-        public IEnumerable<PatioEntity>? ObterTodos()
+        public async Task<IEnumerable<PatioEntity>?> ObterTodos()
         {
-            return _context.Patio.OrderBy(o => o.Id).ToList();
+            return await _context.Patio.OrderBy(o => o.Id).ToListAsync();
         }
     }
 }
