@@ -4,6 +4,7 @@ using dashmottu.API.Domain.Interfaces;
 using dashmottu.API.Infrastructure.Data.AppData;
 using dashmottu.API.Infrastructure.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
     c.EnableAnnotations();
+    c.ExampleFilters();
 });
+
+builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 
 var app = builder.Build();
 
