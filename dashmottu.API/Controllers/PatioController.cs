@@ -2,6 +2,7 @@
 using dashmottu.API.Doc.Samples;
 using dashmottu.API.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System.Net;
@@ -27,6 +28,7 @@ namespace dashmottu.API.Controllers
         [SwaggerResponse(200, "Lista de pátios retornada com sucesso.", typeof(IEnumerable<PatioCreateDto>))]
         [SwaggerResponse(204, "Nenhum pátio encontrado.")]
         [SwaggerResponseExample(statusCode:200, typeof(PatioResponseListSample))]
+        [EnableRateLimiting("rateLimitPolicy")]
         public async Task<IActionResult> ObterTodos()
         {
             var objModel = await _applicationService.ObterTodosPatios();
@@ -43,6 +45,9 @@ namespace dashmottu.API.Controllers
             Summary = "Obter pátio por ID",
             Description = "Retorna os dados de um pátio específico, com base no ID fornecido."
         )]
+        [SwaggerResponse(200, "Pátio retornado com sucesso", typeof(PatioCreateDto))]
+        [SwaggerResponse(204, "Nenhum pátio encontrado.")]
+        [SwaggerResponseExample(statusCode:200, typeof(PatioResponseSample))]
         public async Task<IActionResult> ObterPorId(int id)
         {
             try
