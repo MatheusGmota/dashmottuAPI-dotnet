@@ -25,19 +25,27 @@ namespace dashmottu.API.Controllers
             Summary = "Obter todos os pátios",
             Description = "Retorna uma lista com todos os registros de pátios cadastrados no sistema."
         )]
-        [SwaggerResponse(200, "Lista de pátios retornada com sucesso.", typeof(IEnumerable<PatioCreateDto>))]
+        [SwaggerResponse(200, "Lista de pátios retornada com sucesso.", typeof(IEnumerable<PatioResponse>))]
         [SwaggerResponse(204, "Nenhum pátio encontrado.")]
         [SwaggerResponseExample(statusCode:200, typeof(PatioResponseListSample))]
-        [EnableRateLimiting("rateLimitPolicy")]
+        [EnableRateLimiting("rateLimitePolicy")]
         public async Task<IActionResult> ObterTodos()
         {
-            var objModel = await _applicationService.ObterTodosPatios();
+            try { 
+                var objModel = await _applicationService.ObterTodosPatios();
 
-            if (objModel is not null)
-                return Ok(objModel);
+                if (objModel is not null)
+                    return Ok(objModel);
 
-            return NoContent();
-
+                return NoContent();
+            } catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Error = ex.Message,
+                    status = HttpStatusCode.BadRequest,
+                });
+            }
         }
 
         [HttpGet("{id}")]
@@ -45,9 +53,9 @@ namespace dashmottu.API.Controllers
             Summary = "Obter pátio por ID",
             Description = "Retorna os dados de um pátio específico, com base no ID fornecido."
         )]
-        [SwaggerResponse(200, "Pátio retornado com sucesso", typeof(PatioCreateDto))]
+        [SwaggerResponse(200, "Pátio retornado com sucesso", typeof(PatioResponse))]
         [SwaggerResponse(204, "Nenhum pátio encontrado.")]
-        [SwaggerResponseExample(statusCode:200, typeof(PatioResponseSample))]
+        [SwaggerResponseExample(statusCode: 200, typeof(PatioResponseSample))]
         public async Task<IActionResult> ObterPorId(int id)
         {
             try
@@ -74,7 +82,7 @@ namespace dashmottu.API.Controllers
             Summary = "Cadastrar um novo pátio",
             Description = "Cadastra um novo pátio com endereço, imagem da planta e informações de login."
         )]
-        public async Task<IActionResult > Criar([FromBody] PatioCreateDto novoPatio)
+        public async Task<IActionResult> Criar([FromBody] PatioRequest novoPatio)
         {
             try
             {
@@ -100,25 +108,7 @@ namespace dashmottu.API.Controllers
                     Error = ex.Message
                 });
             }
-            
-        }
 
-        [HttpPost("login")]
-        [SwaggerOperation(
-            Summary = "Login do pátio",
-            Description = "Realiza o login de um pátio com base nas credenciais fornecidas."
-        )]
-        public async Task<IActionResult> Login([FromBody] LoginDto login)
-        {
-            var objModel = await _applicationService.ValidarLogin(login);
-            if (objModel is not null)
-                return Ok(objModel);
-
-            return BadRequest(new
-            {
-                status = HttpStatusCode.BadRequest,
-                Error = "Login ou senha inválidos"
-            });
         }
 
         [HttpPut("{id}")]
@@ -126,7 +116,7 @@ namespace dashmottu.API.Controllers
             Summary = "Atualizar um pátio",
             Description = "Atualiza os dados de um pátio existente com base no ID fornecido."
         )]
-        public async Task<IActionResult> Atualizar(int id, [FromBody] PatioCreateDto patioAtualizado)
+        public async Task<IActionResult> Atualizar(int id, [FromBody] PatioRequest patioAtualizado)
         {
             try
             {
