@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace dashmottu.API.Domain.Entities
 {
@@ -19,5 +20,11 @@ namespace dashmottu.API.Domain.Entities
         [Required]
         [Column("SENHA")]
         public string Senha { get; set; }
+
+        [Column("ID_PATIO")]
+        public int PatioId { get; set; }
+
+        [JsonIgnore]
+        public PatioEntity Patio { get; set; }
     }
 }

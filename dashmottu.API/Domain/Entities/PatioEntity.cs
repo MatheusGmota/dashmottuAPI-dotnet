@@ -10,16 +10,12 @@ namespace dashmottu.API.Domain.Entities
         [Column("ID_PATIO")]
         public int Id { get; set; }
 
-        [ForeignKey("Login")]
-        [Column("ID_LOGIN")]
-        public int IdLogin { get; set; }
-
-        [ForeignKey("Endereco")]
-        [Column("ID_ENDERECO")]
-        public int IdEndereco { get; set; }
-
         [Required]
-        [Column("URL_IMG_PLANTA")]
-        public string UrlImgPlanta { get; set; }
+        public string UrlImgPlanta { get; set; } = string.Empty;
+        
+        public LoginEntity Login { get; set; }
+
+        public EnderecoEntity Endereco { get; set; }
+
     }
 }
