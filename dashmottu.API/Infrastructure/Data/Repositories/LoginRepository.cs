@@ -43,23 +43,9 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             return await _context.Login.FindAsync(id);
         }
 
-        public async Task<LoginResponseDto> ValidarLogin(LoginDto login)
+        public async Task<LoginEntity?> VerificaUsuarioExistente(LoginEntity login)
         {
-            var loginEntity = await _context.Login.Include(l => l.Patio).FirstOrDefaultAsync(l => l.Usuario == login.Usuario);
-
-            if (loginEntity == null || loginEntity.Senha != login.Senha)
-                return new LoginResponseDto(false, null, null);
-
-            return new LoginResponseDto(
-                true,
-                loginEntity.Patio?.Id,
-                new GeneratorToken().GenerateToken(loginEntity.Id)
-            );
-        }
-
-        public LoginEntity? VerificaUsuarioExistente(LoginEntity login)
-        {
-            return _context.Login.FirstOrDefault(x => x.Usuario == login.Usuario);
+            return await _context.Login.FirstOrDefaultAsync(l => l.Usuario == login.Usuario);
         }
     }
 }
