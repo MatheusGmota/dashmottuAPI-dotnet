@@ -2,7 +2,8 @@
 using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
-using System.Threading.Tasks;
+using dashmottu.API.Mappers;
+using System.IO;
 
 namespace dashmottu.API.Application.Services
 {
@@ -21,146 +22,102 @@ namespace dashmottu.API.Application.Services
             _enderecoRepository = enderecoRepository;
         }
 
-        public async Task<PatioCreateDto?> AdicionarPatio(PatioCreateDto patioDto)
+        public async Task<PatioResponse?> AdicionarPatio(PatioRequest entidade)
         {
-            var patios = await ObterTodosPatios();
-            if (patios == null) throw new Exception("Erro ao obter pátios existentes.");
-
-            var usuarioExistente = patios.FirstOrDefault(p => p.Login.Usuario.Equals(patioDto.Login.Usuario));
-            if (usuarioExistente != null)
-                throw new Exception("Já existe um cadastro com este nome de usuário.");
-
-            var login = new LoginEntity { Usuario = patioDto.Login.Usuario, Senha = patioDto.Login.Senha };
-            var endereco = new EnderecoEntity
+            // Adiciona patio
+            var patio = await _repository.Adicionar(new PatioEntity
             {
-                Cep = patioDto.Endereco.Cep,
-                Cidade = patioDto.Endereco.Cidade,
-                Estado = patioDto.Endereco.Estado,
-                Logradouro = patioDto.Endereco.Logradouro,
-                Numero = patioDto.Endereco.Numero,
-                Bairro = patioDto.Endereco.Bairro
-            };
+                UrlImgPlanta = entidade.UrlImgPlanta,
+            });
 
-            var loginAdicionado = _loginRepository.Adicionar(login);
-            var enderecoAdicionado = _enderecoRepository.Adicionar(endereco);
+            if (patio is null)
+                throw new Exception("Erro ao adicionar pátio.");
 
-            if (loginAdicionado is not null || enderecoAdicionado is not null)
+            var enderecoEntity = entidade.Endereco.ToEntity();
+            enderecoEntity.PatioId = patio.Id;
+
+            // Caso contrario adiciona o login e endereco
+            var endereco = await _enderecoRepository.Adicionar(enderecoEntity);
+
+            if (endereco is null)
+                throw new Exception("Erro ao adicionar endereço.");
+
+            return patio.ToResponse();
+        }
+
+        public async Task<PatioResponse?> EditarPatio(int id, PatioRequest entidade)
+        {
+            var resposta = await _repository.ObterPorId(id);
+
+            if (resposta == null)
+                throw new Exception("Pátio não encontrado!");
+
+            // Busca o endereço já existente vinculado ao pátio
+            var enderecoExistente = await _enderecoRepository.ObterPorId(resposta.Id);
+
+            if (enderecoExistente == null)
+                throw new Exception("Endereço não encontrado para este pátio.");
+
+            // Atualiza os campos
+            enderecoExistente.Cep = entidade.Endereco.Cep;
+            enderecoExistente.Logradouro = entidade.Endereco.Logradouro;
+            enderecoExistente.Numero = entidade.Endereco.Numero;
+            enderecoExistente.Bairro = entidade.Endereco.Bairro;
+            enderecoExistente.Cidade = entidade.Endereco.Cidade;
+            enderecoExistente.Estado = entidade.Endereco.Estado;
+
+            var endereco = await _enderecoRepository.Atualizar(enderecoExistente);
+
+            if (endereco is not null)
             {
-                var patio = new PatioEntity
-                {
-                    IdEndereco = enderecoAdicionado.Id,
-                    IdLogin = loginAdicionado.Id,
-                    UrlImgPlanta = patioDto.UrlImgPlanta
-                };
-                var obj = await _repository.Adicionar(patio);
-                return new PatioCreateDto { Id = obj.Id, Endereco = patioDto.Endereco, Login = patioDto.Login, UrlImgPlanta = obj.UrlImgPlanta };
+                var patioEntity = await _repository.ObterEntityPorId(id);
+                if (patioEntity == null)
+                    throw new Exception("Pátio não encontrado para atualizar.");
+
+                patioEntity.UrlImgPlanta = entidade.UrlImgPlanta;
+                patioEntity.Endereco = endereco;
+
+                var model = await _repository.Atualizar(patioEntity);
+
+                if (model is null)
+                    throw new Exception("Erro ao atualizar pátio.");
+
+                return model.ToResponse();
+            }
+
+            return null;
+        }
+
+
+        public async Task<PatioResponse?> ObterPatioPorId(int id)
+        {
+            var resposta = await _repository.ObterPorId(id);
+            if (resposta is not null)
+            {
+                return resposta;
             }
             return null;
         }
 
-        public async Task<PatioCreateDto?> EditarPatio(int id, PatioCreateDto patioDto)
-        {
-            var login = new LoginEntity { Usuario = patioDto.Login.Usuario, Senha = patioDto.Login.Senha };
-            var endereco = new EnderecoEntity
-            {
-                Cep = patioDto.Endereco.Cep,
-                Cidade = patioDto.Endereco.Cidade,
-                Estado = patioDto.Endereco.Estado,
-                Logradouro = patioDto.Endereco.Logradouro,
-                Numero = patioDto.Endereco.Numero,
-                Bairro = patioDto.Endereco.Bairro
-            };
-
-            var loginAdicionado = _loginRepository.Atualizar(login);
-            var enderecoAdicionado = _enderecoRepository.Atualizar(endereco);
-
-            if (loginAdicionado is not null || enderecoAdicionado is not null)
-            {
-                var patio = new PatioEntity
-                {
-                    Id = id,
-                    IdEndereco = enderecoAdicionado.Id,
-                    IdLogin = loginAdicionado.Id,
-                    UrlImgPlanta = patioDto.UrlImgPlanta
-                };
-                var obj = await _repository.Atualizar(patio);
-                return new PatioCreateDto { Id = obj.Id, Endereco = patioDto.Endereco, Login = patioDto.Login, UrlImgPlanta = obj.UrlImgPlanta };
-            }
-            return null;
-        }
-
-        public async Task<PatioCreateDto?> ObterPatioPorId(int id)
-        {
-            var porId = await _repository.ObterPorId(id);
-            if (porId is not null)
-            {
-                var login = _loginRepository.ObterPorId(porId.IdLogin);
-                var endereco = _enderecoRepository.ObterPorId(porId.IdEndereco);
-                return new PatioCreateDto
-                {
-                    Id = porId.Id,
-                    UrlImgPlanta = porId.UrlImgPlanta,
-                    Login = new LoginDto
-                    {
-                        Usuario = login.Usuario,
-                        Senha = login.Senha
-                    },
-                    Endereco = new EnderecoDto
-                    {
-                        Cep = endereco.Cep,
-                        Cidade = endereco.Cidade,
-                        Estado = endereco.Estado,
-                        Logradouro = endereco.Logradouro,
-                        Numero = endereco.Numero,
-                        Bairro = endereco.Bairro
-                    }
-                };
-            }
-            return null;
-        }
-
-        public async Task<IEnumerable<PatioCreateDto>> ObterTodosPatios()
+        public async Task<IEnumerable<PatioResponse>> ObterTodosPatios()
         {
             var patios = await _repository.ObterTodos();
-            if (patios == null) return Enumerable.Empty<PatioCreateDto>();
+            if (patios == null) return [];
 
-            return patios.Select(item =>
-            {
-                var login = _loginRepository.ObterPorId(item.IdLogin);
-                var endereco = _enderecoRepository.ObterPorId(item.IdEndereco);
-
-                return new PatioCreateDto
-                {
-                    Id = item.Id,
-                    UrlImgPlanta = item.UrlImgPlanta,
-                    Login = new LoginDto
-                    {
-                        Usuario = login.Usuario,
-                        Senha = login.Senha
-                    },
-                    Endereco = new EnderecoDto
-                    {
-                        Cep = endereco.Cep,
-                        Cidade = endereco.Cidade,
-                        Estado = endereco.Estado,
-                        Logradouro = endereco.Logradouro,
-                        Numero = endereco.Numero,
-                        Bairro = endereco.Bairro
-                    }
-                };
-            }).ToList();
+            return patios;
         }
 
         public async Task<PatioEntity?> DeletarPatio(int id)
         {
-            var patio = await _repository.ObterPorId(id);
+            var patio = await _repository.ObterEntityPorId(id);
+            
             if (patio != null)
             {
-                var endereco = _enderecoRepository.ObterPorId(patio.IdEndereco);
-                var login = _loginRepository.ObterPorId(patio.IdLogin);
-                if (endereco is not null && login is not null)
+                var login = await _loginRepository.ObterPorId(patio.Login.Id);
+
+                if (login is not null)
                 {
-                    _enderecoRepository.Deletar(endereco);
+                    _enderecoRepository.Deletar(patio.Endereco);
                     _loginRepository.Deletar(login);
 
                     _repository.Deletar(patio);
@@ -168,33 +125,5 @@ namespace dashmottu.API.Application.Services
             }
             return patio;
         }
-
-        public async Task<LoginResponseDto> ValidarLogin(LoginDto login)
-        {
-            var patios = await ObterTodosPatios();
-            if (patios == null) throw new Exception("Erro ao obter pátios existentes.");
-
-            var patio = patios.FirstOrDefault(p => 
-                p.Login.Usuario.Equals(login.Usuario) && 
-                p.Login.Senha.Equals(login.Senha));
-
-            return new LoginResponseDto
-            {
-                IsValid = patio != null,
-                IdPatio = patio?.Id,
-                Token = patio != null ? GenerateToken(patio) : null
-            };
-        }
-
-        private string GenerateToken(PatioCreateDto patio)
-        {
-            // Gera um token aleatório baseado no ID do pátio + data + um GUID
-            var rawToken = $"{patio.Id}-{DateTime.UtcNow.Ticks}-{Guid.NewGuid()}";
-
-            // Codifica em Base64 
-            var tokenBytes = System.Text.Encoding.UTF8.GetBytes(rawToken);
-            return Convert.ToBase64String(tokenBytes);
-        }
-
     }
 }
