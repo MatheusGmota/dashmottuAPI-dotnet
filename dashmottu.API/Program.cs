@@ -17,6 +17,7 @@ builder.Services.AddDbContext<ApplicationContext>(x => {
 });
 
 builder.Services.AddTransient<IPatioApplicationService, PatioApplicationService>();
+builder.Services.AddTransient<IAuthApplicationService, AuthApplicationService>();
 builder.Services.AddTransient<IPatioRepository, PatioRepository>();
 builder.Services.AddTransient<ILoginRepository, LoginRepository>();
 builder.Services.AddTransient<IEnderecoRepository, EnderecoRepository>();

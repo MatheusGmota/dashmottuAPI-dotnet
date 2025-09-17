@@ -59,7 +59,14 @@ namespace dashmottu.API.Migrations
                         .HasColumnType("NUMBER(10)")
                         .HasColumnName("NUMERO");
 
+                    b.Property<int>("PatioId")
+                        .HasColumnType("NUMBER(10)")
+                        .HasColumnName("ID_PATIO");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PatioId")
+                        .IsUnique();
 
                     b.ToTable("ENDERECO");
                 });
@@ -73,6 +80,10 @@ namespace dashmottu.API.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("PatioId")
+                        .HasColumnType("NUMBER(10)")
+                        .HasColumnName("ID_PATIO");
+
                     b.Property<string>("Senha")
                         .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)")
@@ -84,6 +95,9 @@ namespace dashmottu.API.Migrations
                         .HasColumnName("USUARIO");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PatioId")
+                        .IsUnique();
 
                     b.HasIndex("Usuario")
                         .IsUnique();
@@ -100,22 +114,44 @@ namespace dashmottu.API.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("IdEndereco")
-                        .HasColumnType("NUMBER(10)")
-                        .HasColumnName("ID_ENDERECO");
-
-                    b.Property<int>("IdLogin")
-                        .HasColumnType("NUMBER(10)")
-                        .HasColumnName("ID_LOGIN");
-
                     b.Property<string>("UrlImgPlanta")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)")
-                        .HasColumnName("URL_IMG_PLANTA");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
 
                     b.ToTable("PATIO");
+                });
+
+            modelBuilder.Entity("dashmottu.API.Domain.Entities.EnderecoEntity", b =>
+                {
+                    b.HasOne("dashmottu.API.Domain.Entities.PatioEntity", "Patio")
+                        .WithOne("Endereco")
+                        .HasForeignKey("dashmottu.API.Domain.Entities.EnderecoEntity", "PatioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patio");
+                });
+
+            modelBuilder.Entity("dashmottu.API.Domain.Entities.LoginEntity", b =>
+                {
+                    b.HasOne("dashmottu.API.Domain.Entities.PatioEntity", "Patio")
+                        .WithOne("Login")
+                        .HasForeignKey("dashmottu.API.Domain.Entities.LoginEntity", "PatioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patio");
+                });
+
+            modelBuilder.Entity("dashmottu.API.Domain.Entities.PatioEntity", b =>
+                {
+                    b.Navigation("Endereco")
+                        .IsRequired();
+
+                    b.Navigation("Login")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
