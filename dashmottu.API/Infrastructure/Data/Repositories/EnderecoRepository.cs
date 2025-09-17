@@ -13,22 +13,22 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public EnderecoEntity? Adicionar(EnderecoEntity endereco)
+        public async Task<EnderecoEntity?> Adicionar(EnderecoEntity endereco)
         {
             if (endereco != null)
             {
                 _context.Endereco.Add(endereco);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             return endereco;
         }
 
-        public EnderecoEntity? Atualizar(EnderecoEntity endereco)
+        public async Task<EnderecoEntity?> Atualizar(EnderecoEntity endereco)
         {
             if (endereco != null)
             {
                 _context.Endereco.Update(endereco);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             return endereco;
         }
@@ -39,9 +39,9 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             _context.SaveChanges();
         }
 
-        public EnderecoEntity? ObterPorId(int id)
+        public async Task<EnderecoEntity?> ObterPorId(int id)
         {
-            return _context.Endereco.Find(id);
+            return await _context.Endereco.FindAsync(id);
         }
     }
 }
