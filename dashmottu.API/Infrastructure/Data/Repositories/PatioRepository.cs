@@ -3,7 +3,6 @@ using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
 using dashmottu.API.Domain.DTOs;
 using Microsoft.EntityFrameworkCore;
-using dashmottu.API.Mappers;
 
 namespace dashmottu.API.Infrastructure.Data.Repositories
 {
@@ -41,40 +40,14 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             _context.SaveChanges(); 
         }
 
-        public async Task<PatioResponse?> ObterPorId(int id)
+        public async Task<PatioEntity?> ObterPorId(int id)
         {
-            return await _context.Patio
-                 .Include(p => p.Endereco)
-                 .Include(p => p.Login)
-                 .Where(p => p.Id == id)
-                 .Select(p => new PatioResponse(
-                     p.Id,
-                     p.UrlImgPlanta,
-                     p.Endereco.ToDto()
-                 ))
-                 .FirstOrDefaultAsync();
+            return await _context.Patio.FindAsync(id);
         }
 
-        public async Task<PatioEntity?> ObterEntityPorId(int id)
+        public async Task<IEnumerable<PatioEntity>?> ObterTodos()
         {
-            return await _context.Patio
-                .Include(p => p.Endereco)
-                .Include(p => p.Login)
-                .FirstOrDefaultAsync(p => p.Id == id);
-        }
-
-
-        public async Task<IEnumerable<PatioResponse>?> ObterTodos()
-        {
-            return await _context.Patio
-                .Include(p => p.Endereco)
-                .OrderBy(p => p.Id)
-                .Select(p => new PatioResponse(
-                    p.Id,
-                    p.UrlImgPlanta,
-                    p.Endereco.ToDto()
-                ))
-                .ToListAsync();
+            return await _context.Patio.OrderBy(o => o.Id).ToListAsync();
         }
     }
 }
