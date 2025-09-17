@@ -1,10 +1,5 @@
 ﻿namespace dashmottu.API.Domain.DTOs
 {
-    public class PatioCreateDto
-    {
-        public int Id { get; set; }
-        public string UrlImgPlanta { get; set; }
-        public EnderecoDto Endereco { get; set; }
-        public LoginDto Login { get; set; }
-    }
+    public record PatioRequest(string UrlImgPlanta, EnderecoDto Endereco);
+    public record PatioResponse(int Id,string UrlImgPlanta, EnderecoDto Endereco);
 }
