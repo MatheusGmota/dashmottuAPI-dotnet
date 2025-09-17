@@ -4,9 +4,9 @@ namespace dashmottu.API.Domain.Interfaces
 {
     public interface IEnderecoRepository
     {
-        EnderecoEntity? Adicionar(EnderecoEntity endereco);
-        EnderecoEntity? Atualizar(EnderecoEntity endereco);
-        EnderecoEntity? ObterPorId(int id);
+        Task<EnderecoEntity?> Adicionar(EnderecoEntity endereco);
+        Task<EnderecoEntity?> Atualizar(EnderecoEntity endereco);
+        Task<EnderecoEntity?> ObterPorId(int id);
         void Deletar(EnderecoEntity endereco);
     }
 }

@@ -5,10 +5,12 @@ namespace dashmottu.API.Domain.Interfaces
 {
     public interface ILoginRepository
     {
-        LoginEntity? Adicionar(LoginEntity login);
-        LoginEntity? Atualizar(LoginEntity login);
-        LoginEntity? ObterPorId(int id);
+        Task<LoginEntity?> Adicionar(LoginEntity login);
+        Task<LoginEntity?> Atualizar(LoginEntity login);
         void Deletar(LoginEntity? login);
+        Task<LoginResponseDto> ValidarLogin(LoginDto login);
+        Task<LoginEntity?> ObterPorId(int id);
+        LoginEntity? VerificaUsuarioExistente(LoginEntity login);
 
     }
 }
