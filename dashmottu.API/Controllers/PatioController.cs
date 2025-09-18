@@ -1,4 +1,5 @@
-﻿using dashmottu.API.Application.Interfaces;
+﻿using dashmottu.API.Application.DTOs;
+using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Doc.Samples;
 using dashmottu.API.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ using Swashbuckle.AspNetCore.Filters;
 using System.Net;
 
 namespace dashmottu.API.Controllers
-{ 
+{
     [ApiController]
     [Route("api/[controller]")]
     public class PatioController : Controller
@@ -27,18 +28,26 @@ namespace dashmottu.API.Controllers
         )]
         [SwaggerResponse(200, "Lista de pátios retornada com sucesso.", typeof(IEnumerable<PatioResponse>))]
         [SwaggerResponse(204, "Nenhum pátio encontrado.")]
-        [SwaggerResponseExample(statusCode:200, typeof(PatioResponseListSample))]
+        [SwaggerResponseExample(statusCode: 200, typeof(PatioResponseListSample))]
         [EnableRateLimiting("rateLimitePolicy")]
-        public async Task<IActionResult> ObterTodos(int Deslocamento = 2, int Limite = 3)
+        public async Task<IActionResult> ObterTodos(int Deslocamento = 0, int Limite = 3)
         {
-            try { 
-                var objModel = await _applicationService.ObterTodosPatios(Deslocamento, Limite);
+            try
+            {
+                var resultado = await _applicationService.ObterTodosPatios(Deslocamento, Limite);
+                if (resultado == null || !resultado.Data.Any())
+                    return NoContent();
+                
+                var patiosComLinks = resultado.Data.Select(patio =>
+                {
+                    GerarLinks(patio);
+                    return patio;
+                }).ToList();
 
-                if (objModel is not null)
-                    return Ok(objModel);
+                return Ok(resultado);
 
-                return NoContent();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(new
                 {
@@ -63,7 +72,10 @@ namespace dashmottu.API.Controllers
                 var objModel = await _applicationService.ObterPatioPorId(id);
 
                 if (objModel is not null)
+                {
+                    GerarLinks(objModel);
                     return Ok(objModel);
+                }
 
                 return NotFound();
             }
@@ -163,5 +175,14 @@ namespace dashmottu.API.Controllers
                 });
             }
         }
+
+        private void GerarLinks(PatioResponse obj)
+        {
+            obj.Links.Add(new LinkDto(Url.Action(nameof(ObterPorId), new { id = obj.Id }), "self", "GET"));
+            obj.Links.Add(new LinkDto(Url.Action(nameof(Criar)), "post", "POST"));
+            obj.Links.Add(new LinkDto(Url.Action(nameof(Atualizar), new { id = obj.Id }), "update", "UPDATE"));
+            obj.Links.Add(new LinkDto(Url.Action(nameof(Excluir), new { id = obj.Id }), "delete", "DELETE"));
+
+        }
     }
-}
+}   
