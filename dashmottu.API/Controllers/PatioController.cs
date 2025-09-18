@@ -29,10 +29,10 @@ namespace dashmottu.API.Controllers
         [SwaggerResponse(204, "Nenhum pátio encontrado.")]
         [SwaggerResponseExample(statusCode:200, typeof(PatioResponseListSample))]
         [EnableRateLimiting("rateLimitePolicy")]
-        public async Task<IActionResult> ObterTodos()
+        public async Task<IActionResult> ObterTodos(int Deslocamento = 2, int Limite = 3)
         {
             try { 
-                var objModel = await _applicationService.ObterTodosPatios();
+                var objModel = await _applicationService.ObterTodosPatios(Deslocamento, Limite);
 
                 if (objModel is not null)
                     return Ok(objModel);

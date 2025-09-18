@@ -1,5 +1,6 @@
 ﻿using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
+using dashmottu.API.Domain.Model;
 
 namespace dashmottu.API.Domain.Interfaces
 {
@@ -9,7 +10,7 @@ namespace dashmottu.API.Domain.Interfaces
 
         Task<PatioEntity?> Atualizar(PatioEntity patio);
 
-        Task<IEnumerable<PatioResponse>?> ObterTodos();
+        Task<PaginacaoModel<IEnumerable<PatioResponse?>>> ObterTodos(int deslocamento, int limite);
 
         Task<PatioResponse?> ObterPorId(int id);
 

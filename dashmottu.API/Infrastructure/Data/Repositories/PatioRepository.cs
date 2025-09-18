@@ -1,6 +1,7 @@
 ﻿using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
+using dashmottu.API.Domain.Model;
 using dashmottu.API.Infrastructure.Data.AppData;
 using dashmottu.API.Mappers;
 using Microsoft.EntityFrameworkCore;
@@ -62,9 +63,10 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<PatioResponse>?> ObterTodos()
+        public async Task<PaginacaoModel<IEnumerable<PatioResponse?>>> ObterTodos(int deslocamento, int limite)
         {
-            return await _context.Patio
+            var total = await _context.Patio.CountAsync();
+            var patios = await _context.Patio
                 .Include(p => p.Endereco)
                 .OrderBy(p => p.Id)
                 .Select(p => new PatioResponse(
@@ -72,7 +74,17 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
                     p.UrlImgPlanta,
                     p.Endereco.ToDto()
                 ))
+                .Skip(deslocamento)
+                .Take(limite)
                 .ToListAsync();
+
+            return new PaginacaoModel<IEnumerable<PatioResponse?>>
+            {
+                Data = patios,
+                Deslocamento = deslocamento,
+                Limite = limite,
+                Total = total
+            };
         }
     }
 }
