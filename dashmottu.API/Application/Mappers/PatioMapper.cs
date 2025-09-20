@@ -22,6 +22,13 @@ namespace dashmottu.API.Application.Mappers
                 },
             };
         }
+        public static PatioEntity ToEntity(this PatioRequest dto)
+        {
+            return new PatioEntity
+            {
+                UrlImgPlanta = dto.UrlImgPlanta,
+            };
+        }
 
         public static PatioResponse ToResponse(this PatioEntity entity)
         {
@@ -38,5 +45,6 @@ namespace dashmottu.API.Application.Mappers
                 )
             );
         }
+
     }
 }
