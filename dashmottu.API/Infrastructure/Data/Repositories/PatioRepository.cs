@@ -3,7 +3,7 @@ using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
 using dashmottu.API.Infrastructure.Data.AppData;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;    
 
 namespace dashmottu.API.Infrastructure.Data.Repositories
 {
@@ -18,27 +18,58 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
 
         public async Task<PatioEntity?> Adicionar(PatioEntity patio)
         {
-            if (patio != null)
-            {
-                _context.Patio.Add(patio);
-                await _context.SaveChangesAsync();
-                return patio;
-            }
-            return null;
-        }
-
-        public async Task<PatioEntity?> Atualizar(PatioEntity patio)
-        {
-            _context.Patio.Update(patio);
-            _context.SaveChanges();
-
+            _context.Add(patio);
+            await _context.SaveChangesAsync();
+            
             return patio;
         }
 
-        public void Deletar(PatioEntity patio)
+        public async Task<PatioEntity?> Atualizar(int id, PatioEntity patio)
         {
-            _context.Patio.Remove(patio);
-            _context.SaveChanges(); 
+            var result = await _context.Patio
+                .Include(x => x.Endereco)
+                .FirstOrDefaultAsync(x => id == x.Id);
+
+            if (result is not null)
+            {
+                result.UrlImgPlanta = patio.UrlImgPlanta;
+                if (result.Endereco is null)
+                {
+                    result.Endereco = new EnderecoEntity
+                    {
+                        Cep = patio.Endereco.Cep,
+                        Logradouro = patio.Endereco.Logradouro,
+                        Numero = patio.Endereco.Numero,
+                        Bairro = patio.Endereco.Bairro,
+                        Cidade = patio.Endereco.Cidade,
+                        Estado = patio.Endereco.Estado,
+                    };
+                }
+                else 
+                    result.Endereco = patio.Endereco;
+
+                _context.Update(result);
+                await _context.SaveChangesAsync();
+                
+                return result;
+            }
+
+            return null;
+        }
+
+        public async Task<PatioEntity?> Deletar(int id)
+        {
+            var result = await _context.Patio.FindAsync(id);
+
+            if (result is not null)
+            {
+                _context.Patio.Remove(result);
+                _context.SaveChanges();
+
+                return result;
+            }
+
+            return null;
         }
 
         public async Task<PatioEntity?> ObterEntityPorId(int id)

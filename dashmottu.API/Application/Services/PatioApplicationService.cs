@@ -1,9 +1,10 @@
-﻿using dashmottu.API.Application.Interfaces;
+﻿using dashmottu.API.Application.DTOs;
+using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Application.Mappers;
 using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
-using System.IO;
+using System.Net;
 
 namespace dashmottu.API.Application.Services
 {
@@ -11,117 +12,96 @@ namespace dashmottu.API.Application.Services
     {
         private readonly IPatioRepository _repository;
 
-        private readonly ILoginRepository _loginRepository;
-
         private readonly IEnderecoRepository _enderecoRepository;
 
-        public PatioApplicationService(IPatioRepository patioRepository, IEnderecoRepository enderecoRepository, ILoginRepository loginRepository)
+        public PatioApplicationService(IPatioRepository patioRepository, IEnderecoRepository enderecoRepository)
         {
             _repository = patioRepository;
-            _loginRepository = loginRepository;
             _enderecoRepository = enderecoRepository;
         }
 
-        public async Task<PatioResponse?> AdicionarPatio(PatioRequest entidade)
+        public async Task<OperationResult<PatioResponse?>> AdicionarPatio(PatioRequest entidade)
         {
-            // Adiciona patio
-            var patio = await _repository.Adicionar(new PatioEntity
+            try
             {
-                UrlImgPlanta = entidade.UrlImgPlanta,
-            });
+                var result = await _repository.Adicionar(entidade.ToEntity());
 
-            if (patio is null)
-                throw new Exception("Erro ao adicionar pátio.");
+                var endereco = await _enderecoRepository.Adicionar(result.Id, entidade.Endereco.ToEntity());
 
-            var enderecoEntity = entidade.Endereco.ToEntity();
-            enderecoEntity.PatioId = patio.Id;
+                result.Endereco = endereco;
 
-            // Caso contrario adiciona o login e endereco
-            var endereco = await _enderecoRepository.Adicionar(enderecoEntity);
-
-            if (endereco is null)
-                throw new Exception("Erro ao adicionar endereço.");
-
-            return patio.ToResponse();
-        }
-
-        public async Task<PatioResponse?> EditarPatio(int id, PatioRequest entidade)
-        {
-            var resposta = await _repository.ObterPorId(id);
-
-            if (resposta == null)
-                throw new Exception("Pátio não encontrado!");
-
-            // Busca o endereço já existente vinculado ao pátio
-            var enderecoExistente = await _enderecoRepository.ObterPorId(resposta.Id);
-
-            if (enderecoExistente == null)
-                throw new Exception("Endereço não encontrado para este pátio.");
-
-            // Atualiza os campos
-            enderecoExistente.Cep = entidade.Endereco.Cep;
-            enderecoExistente.Logradouro = entidade.Endereco.Logradouro;
-            enderecoExistente.Numero = entidade.Endereco.Numero;
-            enderecoExistente.Bairro = entidade.Endereco.Bairro;
-            enderecoExistente.Cidade = entidade.Endereco.Cidade;
-            enderecoExistente.Estado = entidade.Endereco.Estado;
-
-            var endereco = await _enderecoRepository.Atualizar(enderecoExistente);
-
-            if (endereco is not null)
-            {
-                var patioEntity = await _repository.ObterEntityPorId(id);
-                if (patioEntity == null)
-                    throw new Exception("Pátio não encontrado para atualizar.");
-
-                patioEntity.UrlImgPlanta = entidade.UrlImgPlanta;
-                patioEntity.Endereco = endereco;
-
-                var model = await _repository.Atualizar(patioEntity);
-
-                if (model is null)
-                    throw new Exception("Erro ao atualizar pátio.");
-
-                return model.ToResponse();
+                return OperationResult<PatioResponse?>.Sucess(result.ToResponse(), (int)HttpStatusCode.Created);
             }
-
-            return null;
-        }
-
-
-        public async Task<PatioResponse?> ObterPatioPorId(int id)
-        {
-            var resposta = await _repository.ObterPorId(id);
-            if (resposta is not null)
+            //TODO: Criar uma exceção personalizada para erro ao persistir patio e endereco
+            catch (Exception)
             {
-                return resposta;
+                return OperationResult<PatioResponse?>.Failure("Erro ao cadastrar pátio.");
             }
-            return null;
         }
 
-        public async Task<PageResultModel<IEnumerable<PatioResponse?>>> ObterTodosPatios(int deslocamento, int limite)
+        public async Task<OperationResult<PatioEntity?>> DeletarPatio(int id)
         {
-            var patios = await _repository.ObterTodos(deslocamento, limite);
-            return patios;
-        }
-
-        public async Task<PatioEntity?> DeletarPatio(int id)
-        {
-            var patio = await _repository.ObterEntityPorId(id);
-            
-            if (patio != null)
+            try
             {
-                var login = await _loginRepository.ObterPorId(patio.Login.Id);
+                var result = await _repository.Deletar(id);
 
-                if (login is not null)
-                {
-                    _enderecoRepository.Deletar(patio.Endereco);
-                    _loginRepository.Deletar(login);
+                if (result is null) return OperationResult<PatioEntity?>.Failure("Pátio não encontrado", (int)HttpStatusCode.NoContent);
 
-                    _repository.Deletar(patio);
-                }
+                return OperationResult<PatioEntity?>.Sucess(result);
             }
-            return patio;
+            catch (Exception)
+            {
+                return OperationResult<PatioEntity?>.Failure("Erro ao deletar pátio.");
+            }
+        }
+
+        public async Task<OperationResult<PatioResponse?>> EditarPatio(int id, PatioRequest entidade)
+        {
+            try
+            {
+                var result = await _repository.Atualizar(id, entidade.ToEntity());
+
+                if (result is null) return OperationResult<PatioResponse?>.Failure("Pátio não encontrado", (int)HttpStatusCode.NoContent);
+
+                return OperationResult<PatioResponse?>.Sucess(result.ToResponse());
+            }
+            catch (Exception ex)
+            {
+                return OperationResult<PatioResponse?>.Failure("Erro ao editar pátio.");
+            }
+        }
+
+        public async Task<OperationResult<PatioResponse?>> ObterPatioPorId(int id)
+        {
+            try
+            {
+                var result = await _repository.ObterPorId(id);
+
+                if (result is null) return OperationResult<PatioResponse?>.Failure("Pátio não encontrado", (int)HttpStatusCode.NoContent);
+                    
+                return OperationResult<PatioResponse?>.Sucess(result);
+            }
+            catch (Exception)
+            {
+                return OperationResult<PatioResponse?>.Failure("Erro ao obter pátio.");
+            }
+        }
+
+        public async Task<OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>> ObterTodosPatios(int deslocamento, int limite)
+        {
+            try
+            {
+                var result = await _repository.ObterTodos(deslocamento, limite);
+
+                if (!result.Data.Any())
+                    return OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>.Failure("Não existe conteúdo para pátios", (int)HttpStatusCode.NoContent);
+
+                return OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>.Sucess(result);
+            }
+            catch (Exception)
+            {
+                return OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>.Failure("Erro ao obter pátios.");
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ namespace dashmottu.API.Domain.Interfaces
     {
         Task<PatioEntity?> Adicionar(PatioEntity patio);
 
-        Task<PatioEntity?> Atualizar(PatioEntity patio);
+        Task<PatioEntity?> Atualizar(int id, PatioEntity patio);
 
         Task<PageResultModel<IEnumerable<PatioResponse?>>> ObterTodos(int deslocamento, int limite);
 
@@ -15,6 +15,6 @@ namespace dashmottu.API.Domain.Interfaces
 
         Task<PatioEntity?> ObterEntityPorId(int id);
 
-        void Deletar(PatioEntity patio);
+        Task<PatioEntity?> Deletar(int id);
     }
 }

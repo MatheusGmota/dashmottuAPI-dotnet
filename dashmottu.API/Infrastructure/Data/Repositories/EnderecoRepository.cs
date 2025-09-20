@@ -13,13 +13,13 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public async Task<EnderecoEntity?> Adicionar(EnderecoEntity endereco)
+        public async Task<EnderecoEntity?> Adicionar(int IdPatio, EnderecoEntity endereco)
         {
-            if (endereco != null)
-            {
-                _context.Endereco.Add(endereco);
-                await _context.SaveChangesAsync();
-            }
+            endereco.PatioId = IdPatio;
+            
+            _context.Endereco.Add(endereco);
+            await _context.SaveChangesAsync();
+            
             return endereco;
         }
 
