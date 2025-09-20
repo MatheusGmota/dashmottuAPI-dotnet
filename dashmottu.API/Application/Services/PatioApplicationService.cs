@@ -1,9 +1,8 @@
 ﻿using dashmottu.API.Application.Interfaces;
+using dashmottu.API.Application.Mappers;
 using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
-using dashmottu.API.Domain.Model;
-using dashmottu.API.Mappers;
 using System.IO;
 
 namespace dashmottu.API.Application.Services
@@ -100,7 +99,7 @@ namespace dashmottu.API.Application.Services
             return null;
         }
 
-        public async Task<PaginacaoModel<IEnumerable<PatioResponse?>>> ObterTodosPatios(int deslocamento, int limite)
+        public async Task<PageResultModel<IEnumerable<PatioResponse?>>> ObterTodosPatios(int deslocamento, int limite)
         {
             var patios = await _repository.ObterTodos(deslocamento, limite);
             return patios;

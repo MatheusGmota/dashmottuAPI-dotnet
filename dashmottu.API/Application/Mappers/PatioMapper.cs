@@ -1,7 +1,7 @@
 ﻿using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
 
-namespace dashmottu.API.Mappers
+namespace dashmottu.API.Application.Mappers
 {
     public static class PatioMapper
     {

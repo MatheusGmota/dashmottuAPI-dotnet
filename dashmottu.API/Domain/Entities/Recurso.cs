@@ -1,6 +1,6 @@
 ﻿using dashmottu.API.Application.DTOs;
 
-namespace dashmottu.API.Domain.Model
+namespace dashmottu.API.Domain.Entities
 {
     public record Recurso
     {
