@@ -1,4 +1,4 @@
-﻿using dashmottu.API.Domain.Model;
+﻿using dashmottu.API.Domain.Entities;
 
 namespace dashmottu.API.Domain.DTOs
 {

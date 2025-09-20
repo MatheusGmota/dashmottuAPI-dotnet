@@ -1,7 +1,7 @@
 ﻿using dashmottu.API.Application.Interfaces;
+using dashmottu.API.Application.Mappers;
 using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Interfaces;
-using dashmottu.API.Mappers;
 
 namespace dashmottu.API.Application.Services
 {
@@ -27,7 +27,7 @@ namespace dashmottu.API.Application.Services
                 return new LoginResponseDto(
                     true,
                     idPatio,
-                    new GeneratorToken().GenerateToken(idPatio)
+                    GenerateToken(idPatio)
                 );
             }
 
@@ -43,10 +43,17 @@ namespace dashmottu.API.Application.Services
                 return new LoginResponseDto(
                     true,
                     usuarioExistente.PatioId,
-                    new GeneratorToken().GenerateToken(usuarioExistente.PatioId)
+                    GenerateToken(usuarioExistente.PatioId)
                 );
             }
             return new LoginResponseDto(false, null, null);
+        }
+
+        private string GenerateToken(int id)
+        {
+            var rawToken = $"{id}-{DateTime.UtcNow.Ticks}-{Guid.NewGuid()}";
+            var tokenBytes = System.Text.Encoding.UTF8.GetBytes(rawToken);
+            return Convert.ToBase64String(tokenBytes);
         }
     }
 }
