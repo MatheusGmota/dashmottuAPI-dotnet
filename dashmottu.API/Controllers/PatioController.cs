@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
-using System.Net;
 
 namespace dashmottu.API.Controllers
 {
@@ -32,29 +31,15 @@ namespace dashmottu.API.Controllers
         [EnableRateLimiting("rateLimitePolicy")]
         public async Task<IActionResult> ObterTodos(int Deslocamento = 0, int Limite = 3)
         {
-            try
-            {
-                var resultado = await _applicationService.ObterTodosPatios(Deslocamento, Limite);
-                if (resultado == null || !resultado.Data.Any())
-                    return NoContent();
-                
-                var patiosComLinks = resultado.Data.Select(patio =>
-                {
-                    GerarLinks(patio);
-                    return patio;
-                }).ToList();
+            var resultado = await _applicationService.ObterTodosPatios(Deslocamento, Limite);
+            if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
-                return Ok(resultado);
-
-            }
-            catch (Exception ex)
+            var hateoas = resultado.Value.Data.Select(obj =>
             {
-                return BadRequest(new
-                {
-                    Error = ex.Message,
-                    status = HttpStatusCode.BadRequest,
-                });
-            }
+                GerarLinks(obj);
+                return obj;
+            });
+            return StatusCode(resultado.StatusCode, hateoas);
         }
 
         [HttpGet("{id}")]
@@ -67,26 +52,12 @@ namespace dashmottu.API.Controllers
         [SwaggerResponseExample(statusCode: 200, typeof(PatioResponseSample))]
         public async Task<IActionResult> ObterPorId(int id)
         {
-            try
-            {
-                var objModel = await _applicationService.ObterPatioPorId(id);
+            var resultado = await _applicationService.ObterPatioPorId(id);
+            if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
-                if (objModel is not null)
-                {
-                    GerarLinks(objModel);
-                    return Ok(objModel);
-                }
+            GerarLinks(resultado.Value);
 
-                return NotFound();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    Error = ex.Message,
-                    status = HttpStatusCode.BadRequest,
-                });
-            }
+            return StatusCode(resultado.StatusCode, resultado.Value);
         }
 
         [HttpPost]
@@ -94,33 +65,18 @@ namespace dashmottu.API.Controllers
             Summary = "Cadastrar um novo pátio",
             Description = "Cadastra um novo pátio com endereço, imagem da planta e informações de login."
         )]
+        [SwaggerRequestExample(typeof(PatioRequest),typeof(PatioRequestSample))]
+        [SwaggerResponse(201, "Pátio criado com sucesso.", typeof(PatioResponse))]
+        [SwaggerResponseExample(statusCode: 201, typeof(PatioResponseSample))]
         public async Task<IActionResult> Criar([FromBody] PatioRequest novoPatio)
         {
-            try
-            {
-                var objModel = await _applicationService.AdicionarPatio(novoPatio);
-                if (objModel is not null)
-                    return CreatedAtAction(
-                        nameof(ObterPorId),
-                        new { id = objModel.Id },
-                        objModel
-                    );
+            var resultado = await _applicationService.AdicionarPatio(novoPatio);
+            
+            if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
-                return BadRequest(new
-                {
-                    status = HttpStatusCode.BadRequest,
-                    Error = "Não foi possivel salvar os dados"
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    status = HttpStatusCode.BadRequest,
-                    Error = ex.Message
-                });
-            }
+            GerarLinks(resultado.Value);
 
+            return StatusCode(resultado.StatusCode, resultado.Value);
         }
 
         [HttpPut("{id}")]
@@ -130,24 +86,13 @@ namespace dashmottu.API.Controllers
         )]
         public async Task<IActionResult> Atualizar(int id, [FromBody] PatioRequest patioAtualizado)
         {
-            try
-            {
-                var objModel = await _applicationService.EditarPatio(id, patioAtualizado);
+            var resultado = await _applicationService.EditarPatio(id, patioAtualizado);
+            
+            if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
-                if (objModel is not null)
-                    return Ok(objModel);
-
-                return BadRequest("Não foi possivel salvar os dados");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    Error = ex.Message,
-                    status = HttpStatusCode.BadRequest,
-                });
-            }
-
+            GerarLinks(resultado.Value);
+            
+            return StatusCode(resultado.StatusCode, resultado.Value);
         }
 
         [HttpDelete("{id}")]
@@ -157,32 +102,20 @@ namespace dashmottu.API.Controllers
         )]
         public async Task<IActionResult> Excluir(int id)
         {
-            try
-            {
-                var objModel = await _applicationService.DeletarPatio(id);
+            var resultado = await _applicationService.DeletarPatio(id);
 
-                if (objModel is not null)
-                    return Ok("Objeto deletado com sucesso!");
+            if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
-                return NotFound();
-            }
-            catch (Exception)
-            {
-                return BadRequest(new
-                {
-                    status = HttpStatusCode.BadRequest,
-                    Error = "Não foi possivel deletar o objeto"
-                });
-            }
+            return StatusCode(resultado.StatusCode, resultado.Value);
         }
 
         private void GerarLinks(PatioResponse obj)
         {
-            obj.Links.Add(new LinkDto(Url.Action(nameof(ObterPorId), new { id = obj.Id }), "self", "GET"));
-            obj.Links.Add(new LinkDto(Url.Action(nameof(Criar)), "post", "POST"));
-            obj.Links.Add(new LinkDto(Url.Action(nameof(Atualizar), new { id = obj.Id }), "update", "UPDATE"));
-            obj.Links.Add(new LinkDto(Url.Action(nameof(Excluir), new { id = obj.Id }), "delete", "DELETE"));
-
+            obj.Links = new LinkDto(
+                Url.Action(nameof(ObterPorId), "Patio", new { id = obj.Id }, Request.Scheme),
+                Url.Action(nameof(Atualizar), "Patio", new { id = obj.Id }, Request.Scheme),
+                Url.Action(nameof(Excluir), "Patio", new { id = obj.Id }, Request.Scheme));
         }
+
     }
 }   

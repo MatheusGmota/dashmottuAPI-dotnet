@@ -5,10 +5,10 @@ namespace dashmottu.API.Application.Interfaces
 {
     public interface IPatioApplicationService
     {
-        Task<PageResultModel<IEnumerable<PatioResponse?>>> ObterTodosPatios(int deslocamento, int limite);
-        Task<PatioResponse?> AdicionarPatio(PatioRequest entidade);
-        Task<PatioResponse?> EditarPatio(int id, PatioRequest entidade);
-        Task<PatioResponse?> ObterPatioPorId(int id);
-        Task<PatioEntity?> DeletarPatio(int id);
+        Task<OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>> ObterTodosPatios(int deslocamento, int limite);
+        Task<OperationResult<PatioResponse?>> AdicionarPatio(PatioRequest entidade);
+        Task<OperationResult<PatioResponse?>> EditarPatio(int id, PatioRequest entidade);
+        Task<OperationResult<PatioResponse?>> ObterPatioPorId(int id);
+        Task<OperationResult<PatioEntity?>> DeletarPatio(int id);
     }
 }
