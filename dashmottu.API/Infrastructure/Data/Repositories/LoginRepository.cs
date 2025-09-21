@@ -1,6 +1,4 @@
-﻿using dashmottu.API.Application;
-using dashmottu.API.Domain.DTOs;
-using dashmottu.API.Domain.Entities;
+﻿using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
 using dashmottu.API.Infrastructure.Data.AppData;
 using Microsoft.EntityFrameworkCore;
@@ -16,26 +14,66 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public async Task<LoginEntity?> Adicionar(LoginEntity login)
+        public async Task<LoginEntity?> Adicionar(int idPatio, LoginEntity login)
         {
-            _context.Login.Add(login);
-            await _context.SaveChangesAsync();  
+            var patio = await _context.Patio.FindAsync(idPatio);
 
-            return login;
+            if (patio is not null)
+            {
+                login.PatioId = idPatio;
+
+                _context.Login.Add(login);
+                await _context.SaveChangesAsync();  
+
+                return login;
+            }
+            return null;
         }
 
-        public async Task<LoginEntity?> Atualizar(LoginEntity login)
+        public async Task<LoginEntity?> Atualizar(int idPatio, LoginEntity login)
         {
-            _context.Login.Update(login);
-            await _context.SaveChangesAsync();
+            var result = await _context.Patio
+                .Include(x => x.Login)
+                .FirstOrDefaultAsync(x => x.Id == idPatio);
 
-            return login;
+            if (result is not null)
+            {
+                //TODO: Verificar se o usuario ou senha é igual ao que ja existe no banco
+                
+                if (result.Login is null)
+                {
+                    result.Login = new LoginEntity
+                    {
+                        Id = login.Id,
+                        Usuario = login.Usuario,
+                        Senha = login.Senha
+                    };
+                } else 
+                    result.Login = login;
+
+                _context.Login.Update(login);
+                await _context.SaveChangesAsync();
+
+                return result.Login;
+            }
+            return null;
         }
 
-        public void Deletar(LoginEntity? login)
+        public async Task<LoginEntity?> Deletar(int idPatio, LoginEntity? login)
         {
-            _context.Login.Remove(login);
-            _context.SaveChanges();
+            var result = await _context.Patio
+                .Include(x => x.Login)
+                .FirstOrDefaultAsync(x => x.Id == idPatio);
+
+            if (result is not null || result.Login is not null)
+            {
+                _context.Login.Remove(login);
+                _context.SaveChanges();
+
+                return result.Login;
+            }
+
+            return null;
         }
 
         public async Task<LoginEntity?> ObterPorId(int id)

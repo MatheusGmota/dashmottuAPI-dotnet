@@ -1,7 +1,9 @@
 ﻿using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Application.Mappers;
 using dashmottu.API.Domain.DTOs;
+using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
+using System.Net;
 
 namespace dashmottu.API.Application.Services
 {
@@ -14,39 +16,73 @@ namespace dashmottu.API.Application.Services
             _loginRepository = loginRepository;
         }
 
-        public async Task<LoginResponseDto> Adicionar(int idPatio, LoginDto entidade)
+        public async Task<OperationResult<LoginResponseDto?>> Adicionar(int idPatio, LoginDto entidade)
         {
-            var login = entidade.ToEntity();
+            try
+            {
+                var result = await _loginRepository.Adicionar(idPatio, entidade.ToEntity());
 
-            // Verificar se já existe um usuário com o mesmo nome
-            var usuarioExistente = await _loginRepository.VerificaUsuarioExistente(login);
+                if (result is null) return OperationResult<LoginResponseDto?>.Failure("Erro ao adicionar");
 
-            if (usuarioExistente == null) {
-                login.PatioId = idPatio;
-                await _loginRepository.Adicionar(login);
-                return new LoginResponseDto(
-                    true,
-                    idPatio,
-                    GenerateToken(idPatio)
-                );
+                var response = new LoginResponseDto(result.ToDto(), true, idPatio, GenerateToken(idPatio));
+
+                return OperationResult<LoginResponseDto?>.Success(response, (int)HttpStatusCode.Created);
             }
-
-            return new LoginResponseDto(false, null, null);
+            //TODO: Implementar exception personalizada pra usuario existente
+            // catch (UsuarioExistenteException ex) {}
+            catch (Exception ex)
+            {
+                return OperationResult<LoginResponseDto?>.Failure(ex.Message);
+            }
         }
 
-        public async Task<LoginResponseDto> ValidarLogin(LoginDto login)
+        public async Task<OperationResult<LoginResponseDto?>> Deletar(int idPatio, LoginDto login)
         {
-            var loginEntity = login.ToEntity();
-            var usuarioExistente = await _loginRepository.VerificaUsuarioExistente(loginEntity);
-            if (usuarioExistente != null && usuarioExistente.Senha == loginEntity.Senha)
+            try
             {
-                return new LoginResponseDto(
-                    true,
-                    usuarioExistente.PatioId,
-                    GenerateToken(usuarioExistente.PatioId)
-                );
+                var result = await _loginRepository.Deletar(idPatio, login.ToEntity());
+
+                if (result is null) return OperationResult<LoginResponseDto?>.Failure("Pátio não localizado");
+
+                return OperationResult<LoginResponseDto?>.Success(new LoginResponseDto(result.ToDto(), true, idPatio, null));
             }
-            return new LoginResponseDto(false, null, null);
+            catch (Exception)
+            {
+                return OperationResult<LoginResponseDto?>.Failure("Erro ao deletar login");
+            }
+        }
+
+        public async Task<OperationResult<LoginResponseDto?>> EditarLogin(int idPatio, LoginDto login)
+        {
+            try
+            {
+                var result = await _loginRepository.Atualizar(idPatio, login.ToEntity());
+
+                if (result is null) return OperationResult<LoginResponseDto?>.Failure("Pátio não localizado");
+
+                return OperationResult<LoginResponseDto?>.Success(new LoginResponseDto(result.ToDto(), true, idPatio, null));
+
+            }
+            catch (Exception)
+            {
+                return OperationResult<LoginResponseDto?>.Failure("Erro ao editar login");
+            }
+        }
+
+        public async Task<OperationResult<LoginResponseDto?>> ValidarLogin(LoginDto entidade)
+        {
+            try
+            {
+                var result = await _loginRepository.VerificaUsuarioExistente(entidade.ToEntity());
+                if (result is null)
+                    return OperationResult<LoginResponseDto?>.Success(new LoginResponseDto(null, false, null, null), (int)HttpStatusCode.Unauthorized);
+
+                return OperationResult<LoginResponseDto?>.Success(new LoginResponseDto(result.ToDto(), true, result.PatioId, GenerateToken(result.PatioId)));
+            }
+            catch (Exception)
+            {
+                return OperationResult<LoginResponseDto?>.Failure("Erro ao validar login");
+            }
         }
 
         private string GenerateToken(int id)

@@ -2,6 +2,7 @@
 using dashmottu.API.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace dashmottu.API.Controllers
 {
@@ -10,66 +11,38 @@ namespace dashmottu.API.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthApplicationService _applicationService;
-        private readonly IPatioApplicationService _patioService;
 
-        public AuthController(IAuthApplicationService applicationService, IPatioApplicationService patioService)
+        public AuthController(IAuthApplicationService applicationService)
         {
             _applicationService = applicationService;
-            _patioService = patioService;
         }
 
         [HttpPost("{idPatio}")]
         [SwaggerOperation(
-            Summary = "Login do pátio",
-            Description = "Realiza o login de um pátio com base nas credenciais fornecidas."
+            Summary = "Cadastro do login do pátio",
+            Description = "Realiza o cadastro das credenciais de login de um patio."
         )]
-        public async Task<IActionResult> FazerLogin(int idPatio, LoginDto login)
+        [SwaggerRequestExample(typeof(LoginDto), typeof(LoginDtoExample))]
+        [SwaggerResponse(201, "Login cadastrado com sucesso", typeof(LoginResponseDto))]
+        [SwaggerResponseExample(statusCode: 201, typeof(LoginResponseDtoExample))]
+        public async Task<IActionResult> Criar(int idPatio, LoginDto login)
         {
-            try
-            {
-                var patio = await _patioService.ObterPatioPorId(idPatio);
-                if (patio == null)
-                    throw new Exception("Pátio não encontrado");
+            var result = await _applicationService.Adicionar(idPatio, login);
 
-                var obj = await _applicationService.Adicionar(idPatio, login);
-                if (!obj.IsValid) 
-                    return BadRequest(new
-                    {
-                        Data = obj,
-                        Error = "Usuário já existe",
-                        status = System.Net.HttpStatusCode.BadRequest,
-                    });
-                return Ok(obj);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    Error = ex.Message,
-                    status = System.Net.HttpStatusCode.BadRequest,
-                });
-            }
+            if (!result.IsSuccess) return StatusCode(result.StatusCode, result.Error);
+
+            return StatusCode(result.StatusCode, result.Value);
         }
 
         // Validacao de login das crendencias(logindto)
         [HttpPost]
         public async Task<IActionResult> ValidarLogin(LoginDto login)
         {
-            try
-            {
-                var obj = await _applicationService.ValidarLogin(login);
-                if (!obj.IsValid)
-                    return BadRequest(obj);
-                return Ok(obj);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    Error = ex.Message,
-                    status = System.Net.HttpStatusCode.BadRequest,
-                });
-            }
+            var obj = await _applicationService.ValidarLogin(login);
+            
+            if (!obj.IsSuccess) return StatusCode(obj.StatusCode, obj.Error);
+
+            return StatusCode(obj.StatusCode, obj.Value);
         }
 
     }
