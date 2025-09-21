@@ -36,19 +36,19 @@ namespace dashmottu.API.Application.Services
             }
         }
 
-        public async Task<OperationResult<LoginResponseDto?>> Deletar(int idPatio, LoginDto login)
+        public async Task<OperationResult<LoginEntity?>> Deletar(int idPatio)
         {
             try
             {
-                var result = await _loginRepository.Deletar(idPatio, login.ToEntity());
+                var result = await _loginRepository.Deletar(idPatio);
 
-                if (result is null) return OperationResult<LoginResponseDto?>.Failure("Pátio não localizado");
+                if (result is null) return OperationResult<LoginEntity?>.Failure("Login não localizado");
 
-                return OperationResult<LoginResponseDto?>.Success(new LoginResponseDto(result.ToDto(), true, idPatio, null));
+                return OperationResult<LoginEntity?>.Success(result);
             }
             catch (Exception)
             {
-                return OperationResult<LoginResponseDto?>.Failure("Erro ao deletar login");
+                return OperationResult<LoginEntity?>.Failure("Erro ao deletar login");
             }
         }
 
@@ -85,6 +85,19 @@ namespace dashmottu.API.Application.Services
             }
         }
 
+        public async Task<OperationResult<LoginDto?>> ObterLoginPorId(int idPatio)
+        {
+            try
+            {
+                var result = await _loginRepository.ObterPorId(idPatio);
+                if (result is null) return OperationResult<LoginDto?>.Failure("Login não localizado");
+                return OperationResult<LoginDto?>.Success(result.ToDto());
+            }
+            catch (Exception)
+            {
+                return OperationResult<LoginDto?>.Failure("Erro ao obter login");
+            }
+        }
         private string GenerateToken(int id)
         {
             var rawToken = $"{id}-{DateTime.UtcNow.Ticks}-{Guid.NewGuid()}";

@@ -27,6 +27,15 @@ namespace dashmottu.API.Application.Mappers
             return new PatioEntity
             {
                 UrlImgPlanta = dto.UrlImgPlanta,
+                Endereco = new EnderecoEntity
+                {
+                    Cep = dto.Endereco.Cep,
+                    Cidade = dto.Endereco.Cidade,
+                    Estado = dto.Endereco.Estado,
+                    Logradouro = dto.Endereco.Logradouro,
+                    Numero = dto.Endereco.Numero,
+                    Bairro = dto.Endereco.Bairro
+                }
             };
         }
 

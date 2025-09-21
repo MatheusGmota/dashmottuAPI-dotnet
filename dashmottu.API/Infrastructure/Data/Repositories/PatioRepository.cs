@@ -28,15 +28,17 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
         {
             var result = await _context.Patio
                 .Include(x => x.Endereco)
-                .FirstOrDefaultAsync(x => id == x.Id);
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (result is not null)
-            {
+            {   
                 result.UrlImgPlanta = patio.UrlImgPlanta;
+             
                 if (result.Endereco is null)
                 {
                     result.Endereco = new EnderecoEntity
                     {
+                        Id = patio.Endereco.Id,
                         Cep = patio.Endereco.Cep,
                         Logradouro = patio.Endereco.Logradouro,
                         Numero = patio.Endereco.Numero,
@@ -48,8 +50,9 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
                 else 
                     result.Endereco = patio.Endereco;
 
-                _context.Update(result);
-                await _context.SaveChangesAsync();
+                _context.Patio.Update(result);
+                _context.Endereco.Update(result.Endereco);
+                _context.SaveChanges();
                 
                 return result;
             }

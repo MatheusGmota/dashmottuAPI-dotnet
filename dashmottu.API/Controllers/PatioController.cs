@@ -84,13 +84,11 @@ namespace dashmottu.API.Controllers
             Summary = "Atualizar um pátio",
             Description = "Atualiza os dados de um pátio existente com base no ID fornecido."
         )]
-        public async Task<IActionResult> Atualizar(int id, [FromBody] PatioRequest patioAtualizado)
+        public async Task<IActionResult> Atualizar(int id, PatioRequest patioAtualizado)
         {
             var resultado = await _applicationService.EditarPatio(id, patioAtualizado);
             
             if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
-
-            GerarLinks(resultado.Value);
             
             return StatusCode(resultado.StatusCode, resultado.Value);
         }
@@ -106,7 +104,7 @@ namespace dashmottu.API.Controllers
 
             if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
-            return StatusCode(resultado.StatusCode, resultado.Value);
+            return StatusCode(resultado.StatusCode, "Deletado com sucesso");
         }
 
         private void GerarLinks(PatioResponse obj)

@@ -19,7 +19,7 @@ namespace dashmottu.API.Application.Mappers
         }
         public static EnderecoDto ToDto(this EnderecoEntity entity)
         {
-            return new EnderecoDto(
+                return new EnderecoDto(
                 entity.Cep,
                 entity.Logradouro,
                 entity.Numero,
