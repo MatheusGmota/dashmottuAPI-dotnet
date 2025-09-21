@@ -9,7 +9,7 @@
 
         private OperationResult() { }
 
-        public static OperationResult<T> Sucess (T value, int statusCode = 200)
+        public static OperationResult<T> Success (T value, int statusCode = 200)
         {
             return new OperationResult<T> { IsSuccess = true, Value = value, StatusCode = statusCode };
         }

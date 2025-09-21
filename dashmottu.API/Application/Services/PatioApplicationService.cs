@@ -1,5 +1,4 @@
-﻿using dashmottu.API.Application.DTOs;
-using dashmottu.API.Application.Interfaces;
+﻿using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Application.Mappers;
 using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
@@ -30,7 +29,7 @@ namespace dashmottu.API.Application.Services
 
                 result.Endereco = endereco;
 
-                return OperationResult<PatioResponse?>.Sucess(result.ToResponse(), (int)HttpStatusCode.Created);
+                return OperationResult<PatioResponse?>.Success(result.ToResponse(), (int)HttpStatusCode.Created);
             }
             //TODO: Criar uma exceção personalizada para erro ao persistir patio e endereco
             catch (Exception)
@@ -47,7 +46,7 @@ namespace dashmottu.API.Application.Services
 
                 if (result is null) return OperationResult<PatioEntity?>.Failure("Pátio não encontrado", (int)HttpStatusCode.NoContent);
 
-                return OperationResult<PatioEntity?>.Sucess(result);
+                return OperationResult<PatioEntity?>.Success(result);
             }
             catch (Exception)
             {
@@ -63,7 +62,7 @@ namespace dashmottu.API.Application.Services
 
                 if (result is null) return OperationResult<PatioResponse?>.Failure("Pátio não encontrado", (int)HttpStatusCode.NoContent);
 
-                return OperationResult<PatioResponse?>.Sucess(result.ToResponse());
+                return OperationResult<PatioResponse?>.Success(result.ToResponse());
             }
             catch (Exception ex)
             {
@@ -79,7 +78,7 @@ namespace dashmottu.API.Application.Services
 
                 if (result is null) return OperationResult<PatioResponse?>.Failure("Pátio não encontrado", (int)HttpStatusCode.NoContent);
                     
-                return OperationResult<PatioResponse?>.Sucess(result);
+                return OperationResult<PatioResponse?>.Success(result);
             }
             catch (Exception)
             {
@@ -96,7 +95,7 @@ namespace dashmottu.API.Application.Services
                 if (!result.Data.Any())
                     return OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>.Failure("Não existe conteúdo para pátios", (int)HttpStatusCode.NoContent);
 
-                return OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>.Sucess(result);
+                return OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>.Success(result);
             }
             catch (Exception)
             {
