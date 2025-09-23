@@ -11,7 +11,7 @@ using dashmottu.API.Infrastructure.Data.AppData;
 namespace dashmottu.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250916014735_Inicial")]
+    [Migration("20250921175453_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -119,7 +119,8 @@ namespace dashmottu.API.Migrations
 
                     b.Property<string>("UrlImgPlanta")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)");
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("URL_IMAGEM");
 
                     b.HasKey("Id");
 

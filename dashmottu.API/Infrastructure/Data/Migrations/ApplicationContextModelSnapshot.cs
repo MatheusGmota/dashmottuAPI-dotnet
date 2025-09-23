@@ -116,7 +116,8 @@ namespace dashmottu.API.Migrations
 
                     b.Property<string>("UrlImgPlanta")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)");
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("URL_IMAGEM");
 
                     b.HasKey("Id");
 

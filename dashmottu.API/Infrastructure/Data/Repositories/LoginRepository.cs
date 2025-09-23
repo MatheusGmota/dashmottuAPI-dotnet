@@ -16,11 +16,17 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
 
         public async Task<LoginEntity?> Adicionar(int idPatio, LoginEntity login)
         {
-            var patio = await _context.Patio.FindAsync(idPatio);
+            var patio = await _context.Patio.FirstOrDefaultAsync(x => x.Id == idPatio);
 
             if (patio is not null)
             {
                 login.PatioId = idPatio;
+
+                //Verificar se ja existe um login para o patio
+                var existingLogin = await _context.Login.FirstOrDefaultAsync(l => l.Usuario == login.Usuario);
+                if (existingLogin is not null)
+                    //Lancar exception personalizada de usuario existente
+                    return null;
 
                 _context.Login.Add(login);
                 await _context.SaveChangesAsync();  
@@ -38,8 +44,12 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
 
             if (result is not null)
             {
-                //TODO: Verificar se o usuario ou senha é igual ao que ja existe no banco
-                
+                //Verifica se o usuario ja existe em outro login
+                var existingLogin = await _context.Login.FirstOrDefaultAsync(l => l.Usuario == login.Usuario);
+                if (existingLogin is not null)
+                    //Lancar exception personalizada de usuario existente
+                    return null;
+
                 if (result.Login is null)
                 {
                     result.Login = new LoginEntity
@@ -59,31 +69,32 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             return null;
         }
 
-        public async Task<LoginEntity?> Deletar(int idPatio, LoginEntity? login)
+        public async Task<LoginEntity?> Deletar(int idPatio)
         {
-            var result = await _context.Patio
-                .Include(x => x.Login)
-                .FirstOrDefaultAsync(x => x.Id == idPatio);
+            var result = await _context.Login.FirstOrDefaultAsync(x => x.PatioId == idPatio);
 
-            if (result is not null || result.Login is not null)
-            {
-                _context.Login.Remove(login);
-                _context.SaveChanges();
+            if (result is null) return null;
 
-                return result.Login;
-            }
+            _context.Login.Remove(result);
+            await _context.SaveChangesAsync();
 
-            return null;
+            return result;
         }
 
-        public async Task<LoginEntity?> ObterPorId(int id)
+        public async Task<LoginEntity?> ObterPorId(int idPatio)
         {
-            return await _context.Login.FindAsync(id);
+            return await _context.Login.FirstOrDefaultAsync(x => x.PatioId == idPatio);
         }
 
         public async Task<LoginEntity?> VerificaUsuarioExistente(LoginEntity login)
         {
-            return await _context.Login.FirstOrDefaultAsync(l => l.Usuario == login.Usuario);
+            var result = await _context.Login.FirstOrDefaultAsync(l => l.Usuario == login.Usuario);
+            if (result is not null)
+            {
+                if (result.Senha == login.Senha)
+                    return result;
+            };
+            return null;
         }
     }
 }

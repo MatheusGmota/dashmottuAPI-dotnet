@@ -16,7 +16,7 @@ namespace dashmottu.API.Migrations
                 {
                     ID_PATIO = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    UrlImgPlanta = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
+                    URL_IMAGEM = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
                 },
                 constraints: table =>
                 {

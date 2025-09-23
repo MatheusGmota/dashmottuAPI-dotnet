@@ -7,7 +7,7 @@ namespace dashmottu.API.Domain.Interfaces
     {
         Task<LoginEntity?> Adicionar(int idPatio, LoginEntity login);
         Task<LoginEntity?> Atualizar(int idPatio, LoginEntity login);
-        Task<LoginEntity?> Deletar(int idPatio, LoginEntity login);
+        Task<LoginEntity?> Deletar(int idPatio);
         Task<LoginEntity?> ObterPorId(int id);
         Task<LoginEntity?> VerificaUsuarioExistente(LoginEntity login);
 
