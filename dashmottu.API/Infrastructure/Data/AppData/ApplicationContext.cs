@@ -10,6 +10,7 @@ namespace dashmottu.API.Infrastructure.Data.AppData
         }
 
         public DbSet<PatioEntity> Patio {get; set;}
+        public DbSet<MotoEntity> Moto {get; set;}
         public DbSet<EnderecoEntity> Endereco {get; set;}
         public DbSet<LoginEntity> Login {get; set;}
     }

@@ -18,5 +18,6 @@ namespace dashmottu.API.Domain.Entities
 
         public EnderecoEntity Endereco { get; set; }
 
+        public List<MotoEntity> Motos { get; set; }
     }
 }

@@ -13,8 +13,6 @@ namespace dashmottu.API.Domain.Interfaces
 
         Task<PatioResponse?> ObterPorId(int id);
 
-        Task<PatioEntity?> ObterEntityPorId(int id);
-
         Task<PatioEntity?> Deletar(int id);
     }
 }

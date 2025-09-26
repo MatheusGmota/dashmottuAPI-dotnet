@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace dashmottu.API.Migrations
+namespace dashmottu.API.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Inicial : Migration
+    public partial class Incial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -69,6 +69,30 @@ namespace dashmottu.API.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "MOTOS",
+                columns: table => new
+                {
+                    ID_MOTO = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
+                    COD_TAG = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
+                    MODELO = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
+                    PLACA = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
+                    STATUS = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
+                    POSICAO_X = table.Column<double>(type: "BINARY_DOUBLE", nullable: true),
+                    POSICAO_Y = table.Column<double>(type: "BINARY_DOUBLE", nullable: true),
+                    ID_PATIO = table.Column<int>(type: "NUMBER(10)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MOTOS", x => x.ID_MOTO);
+                    table.ForeignKey(
+                        name: "FK_MOTOS_PATIO_ID_PATIO",
+                        column: x => x.ID_PATIO,
+                        principalTable: "PATIO",
+                        principalColumn: "ID_PATIO");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ENDERECO_ID_PATIO",
                 table: "ENDERECO",
@@ -86,6 +110,11 @@ namespace dashmottu.API.Migrations
                 table: "LOGIN",
                 column: "USUARIO",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MOTOS_ID_PATIO",
+                table: "MOTOS",
+                column: "ID_PATIO");
         }
 
         /// <inheritdoc />
@@ -96,6 +125,9 @@ namespace dashmottu.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "LOGIN");
+
+            migrationBuilder.DropTable(
+                name: "MOTOS");
 
             migrationBuilder.DropTable(
                 name: "PATIO");
