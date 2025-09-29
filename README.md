@@ -6,6 +6,16 @@ Esse projeto é uma API Restful utilizando ASP.NET Core Controllers criada para 
 - Lucas Corradini Silveira - RM555118
 - Matheus Gregorio Mota - RM557254
 
+## 🏛️ Justificativa da arquitetura
+
+A aplicação foi desenvolvida seguindo a arquitetura **em camadas (Layered Architecture)**, separando responsabilidades em **Controllers**, **Application Services**, **Domain** e **Infraestrutura**.
+
+- **Controllers**: Responsáveis por receber as requisições HTTP, tratar os parâmetros e devolver as respostas adequadas (com suporte a Swagger e exemplos de resposta).
+- **Application Services**: Contêm a lógica de orquestração da aplicação, chamando os repositórios, validando regras e retornando DTOs apropriados.
+- **Domain**: Define as entidades e regras de negócio, mantendo a lógica independente de frameworks.
+- **Infraestrutura**: Camada dedicada a persistência de dados, repositórios e integração com banco de dados.
+
+
 ## ⚙ Configuração do Banco de Dados
 No arquivo `appsettings.Development.json` em `appsettings.json`, configure os dados do banco Oracle, alterando o `HOST`, `User Id` e a `Password`:
 ```
@@ -40,15 +50,108 @@ cd dashmottu.API
 dotnet build
 dotnet run
 ```
-A API será iniciada em: https://localhost:7046 ou http://localhost:5046
 
-### 📡 Rotas
-- `GET     /api/patio`             - Retorna uma lista com todos os registros de pátios cadastrados no sistema.  
-- `GET     /api/patio/{id}`        - Retorna os dados de um pátio específico, com base no ID fornecido.  
-- `POST    /api/patio`             - Cadastra um novo pátio com endereço, imagem da planta e informações de login.  
-- `POST    /api/patio/login`       - Realiza o login de um pátio com base nas credenciais fornecidas.  
-- `PUT     /api/patio/{id}`        - Atualiza os dados de um pátio existente com base no ID fornecido.  
-- `DELETE  /api/patio/{id}`        - Remove um pátio do sistema com base no ID fornecido.  
+## 📌 Exemplos de uso dos endpoints
+
+### 🚀 **MotoController**
+
+#### ➕ Adicionar uma moto
+
+`POST /api/moto`
+```
+{
+  "codTag": "sd12cas",
+  "modelo": "MOTO_SPORT",
+  "placa": "2314acs",
+  "status": "ATIVA"
+}
+```
+
+#### ✏️ Atualizar uma moto
+`PUT /api/moto/1`
+```
+{
+  "codTag": "sd12cas",
+  "modelo": "MOTO_CUSTOM",
+  "placa": "2314acs",
+  "status": "INATIVA"
+}
+```
+
+#### 🔎 Obter moto por ID
+`GET /api/moto/1`
+
+#### 📋 Obter todas as motos (paginado)
+`GET /api/moto?Deslocamento=0&Limite=5`
+
+#### ❌ Deletar uma moto
+`DELETE /api/moto/1`
+
+### 🚀 **PatioController**
+
+#### 📋 Obter todos os pátios
+`GET /api/patio?Deslocamento=0&Limite=3`
+
+#### 🔎 Obter pátio por ID
+`GET /api/patio/1`
+
+#### ➕ Criar pátio
+`POST /api/patio`
+```
+{
+  "nome": "Pátio Central",
+  "endereco": "Rua Principal, 123",
+  "imagemPlanta": "planta.jpg"
+}
+```
+
+#### ✏️ Atualizar pátio
+`PUT /api/patio/1`
+```
+{
+  "nome": "Pátio Atualizado",
+  "endereco": "Rua Secundária, 456",
+  "imagemPlanta": "planta2.jpg"
+}
+```
+
+#### ❌ Deletar pátio
+`DELETE /api/patio/1`
+
+### 🚀 **AuthController**
+
+#### 🔎 Obter login por ID do pátio
+`GET /api/auth/1`
+
+#### ➕ Criar login para um pátio
+`POST /api/auth?idPatio=1`
+```
+{
+  "username": "admin",
+  "password": "123456"
+}
+```
+
+#### 🔑 Validar login
+`POST /login`
+```
+{
+  "username": "admin",
+  "password": "123456"
+}
+```
+
+#### ✏️ Editar login
+`PUT /api/auth?idPatio=1`
+```
+{
+  "username": "admin",
+  "password": "654321"
+}
+```
+
+#### ❌ Deletar login
+`DELETE /api/auth?idPatio=1` 
 
 ### 📚 Documentação Interativa
 - Ao executar a API, acesse a documentação Swagger digitando `/swagger` para testar os endpoints diretamente pelo navegador.
