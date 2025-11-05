@@ -17,7 +17,7 @@ namespace Revisao.Infra.Data.HealthCheck
         {
             try
             {
-                await _context.Patio.AsNoTracking().Take(1).AnyAsync(cancellationToken);
+                await _context.Patio.AsNoTracking().Take(1).CountAsync(cancellationToken);
 
                 return HealthCheckResult.Healthy("Banco de dados esta online");
             }
