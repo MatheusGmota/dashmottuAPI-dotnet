@@ -11,6 +11,8 @@ namespace dashmottu.API.Application.Interfaces
 
         //Task<MotoResponse?> AtualizarLocalizacao(int id, Localizacao localizacao);
 
+        Task<OperationResult<MotoWithXAndYResponse?>> AdicionarMotoNoPatio(int idPatio, MotoRequest moto);
+
         Task<OperationResult<PageResultModel<IEnumerable<MotoResponse?>>>> ObterTodos(int deslocamento, int limite);
 
         Task<OperationResult<MotoResponse?>> ObterPorId(int id);

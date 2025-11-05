@@ -1,4 +1,4 @@
-﻿using dashmottu.API.Domain.DTOs;
+﻿using dashmottu.API.Application.DTOs;
 using dashmottu.API.Domain.Entities;
 
 namespace dashmottu.API.Application.Mappers

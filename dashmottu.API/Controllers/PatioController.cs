@@ -1,7 +1,6 @@
 ﻿using dashmottu.API.Application.DTOs;
 using dashmottu.API.Application.Interfaces;
-using dashmottu.API.Doc.Samples;
-using dashmottu.API.Domain.DTOs;
+using dashmottu.API.Doc.PatioSamples;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
@@ -60,6 +59,22 @@ namespace dashmottu.API.Controllers
             return StatusCode(resultado.StatusCode, resultado.Value);
         }
 
+        [HttpGet]
+        [Route("{id}/motos")]
+        [SwaggerOperation(
+            Summary = "Obter motos de um pátio",
+            Description = "Retorna uma lista de motos associadas a um pátio específico, com base no ID do pátio fornecido."
+        )]
+        [SwaggerResponse(200, "Lista de motos retornada com sucesso.", typeof(IEnumerable<MotoWithXAndYResponse>))]
+        public async Task<IActionResult> ObterMotos(int id, int Deslocamento = 0, int Limite = 3)
+        {
+            var resultado = await _applicationService.ObterMotos(id, Deslocamento, Limite);
+            
+            if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
+
+            return StatusCode(resultado.StatusCode, resultado.Value);
+        }
+
         [HttpPost]
         [SwaggerOperation(
             Summary = "Cadastrar um novo pátio",
@@ -107,7 +122,7 @@ namespace dashmottu.API.Controllers
             return StatusCode(resultado.StatusCode, "Deletado com sucesso");
         }
 
-        private void GerarLinks(PatioResponse obj)
+        private void GerarLinks(PatioResponse? obj)
         {
             obj.Links = new LinkDto(
                 Url.Action(nameof(ObterPorId), "Patio", new { id = obj.Id }, Request.Scheme),

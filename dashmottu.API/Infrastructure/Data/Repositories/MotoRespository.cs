@@ -1,6 +1,4 @@
 ﻿using dashmottu.API.Application.DTOs;
-using dashmottu.API.Application.Mappers;
-using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
 using dashmottu.API.Infrastructure.Data.AppData;
@@ -22,6 +20,19 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             await _context.SaveChangesAsync();
 
             return moto;
+        }
+
+        public async Task<MotoEntity?> AdicionarMotoNoPatio(int idPatio, MotoEntity entidade)
+        {
+            var result = await _context.Patio.FindAsync(idPatio);
+            if (result is not null)
+            {
+                entidade.PatioId = idPatio;
+                _context.Moto.Add(entidade);
+                await _context.SaveChangesAsync();
+                return entidade;
+            }
+            return null;
         }
 
         public async Task<MotoEntity?> Atualizar(int id, MotoEntity moto)

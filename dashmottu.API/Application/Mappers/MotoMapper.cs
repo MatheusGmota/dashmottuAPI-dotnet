@@ -19,5 +19,10 @@ namespace dashmottu.API.Application.Mappers
                 Status = dto.Status
             };
         }
+
+        public static MotoWithXAndYResponse ToResponse(this MotoEntity entity)
+        {
+            return new MotoWithXAndYResponse(entity.Id, entity.CodTag, entity.Modelo, entity.Placa, entity.Status, entity.PosicaoX, entity.PosicaoY);
+        }
     }
 }

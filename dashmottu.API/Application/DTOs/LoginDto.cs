@@ -1,5 +1,5 @@
-﻿namespace dashmottu.API.Domain.DTOs
+﻿namespace dashmottu.API.Application.DTOs
 {
     public record LoginDto(string Usuario, string Senha);
-    public record LoginResponseDto(LoginDto? login, bool IsValid, int? IdPatio, string? Token);   
+    public record LoginResponseDto(LoginDto? Login, bool IsValid, int? IdPatio, string? Token);   
 }

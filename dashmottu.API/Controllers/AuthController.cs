@@ -1,7 +1,6 @@
-﻿using dashmottu.API.Application.Interfaces;
+﻿using dashmottu.API.Application.DTOs;
+using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Doc.LoginSamples;
-using dashmottu.API.Doc.Samples;
-using dashmottu.API.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;

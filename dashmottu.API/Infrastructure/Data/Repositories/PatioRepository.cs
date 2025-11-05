@@ -1,5 +1,5 @@
-﻿using dashmottu.API.Application.Mappers;
-using dashmottu.API.Domain.DTOs;
+﻿using dashmottu.API.Application.DTOs;
+using dashmottu.API.Application.Mappers;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
 using dashmottu.API.Infrastructure.Data.AppData;
@@ -81,6 +81,35 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
                 .Include(p => p.Endereco)
                 .Include(p => p.Login)
                 .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public async Task<PageResultModel<PatioComMotosResponse?>> ObterMotos(int IdPatio, int deslocamento, int limite)
+        {
+            var total = await _context.Moto.Where(m => m.PatioId == IdPatio).CountAsync();
+            var motos = await _context.Moto
+                .Where(m => m.PatioId == IdPatio)
+                .Skip(deslocamento)
+                .Take(limite)
+                .Select(m => new MotoWithXAndYResponse(
+                    m.Id,
+                    m.CodTag,
+                    m.Modelo,
+                    m.Placa,
+                    m.Status,
+                    m.PosicaoX,
+                    m.PosicaoY
+                ))
+                .ToListAsync();
+
+            var resultado = new PatioComMotosResponse(IdPatio, motos);
+
+            return new PageResultModel<PatioComMotosResponse?>
+            {
+                Data = resultado,
+                Deslocamento = deslocamento,
+                Limite = limite,
+                Total = total
+            };
         }
 
         public async Task<PatioResponse?> ObterPorId(int id)

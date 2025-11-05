@@ -5,6 +5,8 @@ using dashmottu.API.Infrastructure.Data.AppData;
 using dashmottu.API.Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Revisao.Infra.Data.HealthCheck;
 using Swashbuckle.AspNetCore.Filters;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -51,6 +53,11 @@ builder.Services.AddResponseCompression(options =>
     options.Providers.Add<BrotliCompressionProvider>();
     //options.EnableForHttps = true;
 });
+
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live" }) //Liveness
+    .AddCheck<OracleHealthCheck>("oracle_query", tags: new[] { "ready" }); //Readness
+
 
 builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 {

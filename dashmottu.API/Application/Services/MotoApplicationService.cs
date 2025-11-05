@@ -17,6 +17,22 @@ namespace dashmottu.API.Application.Services
             _repository = repository;
         }
 
+        public async Task<OperationResult<MotoWithXAndYResponse?>> AdicionarMotoNoPatio(int idPatio, MotoRequest entidade)
+        {
+            try
+            {
+                var result = await _repository.AdicionarMotoNoPatio(idPatio, entidade.ToEntity());
+
+                if (result is null) return OperationResult<MotoWithXAndYResponse?>.Failure("Pátio não encontrado", (int)HttpStatusCode.NoContent);
+
+                return OperationResult<MotoWithXAndYResponse?>.Success(result.ToResponse(), (int)HttpStatusCode.Created);
+            }
+            catch (Exception)
+            {
+                return OperationResult<MotoWithXAndYResponse?>.Failure("Erro ao adicionar moto no pátio.");
+            }
+        }
+
         public async Task<OperationResult<MotoResponse?>> Adicionar(MotoRequest moto)
         {
             try

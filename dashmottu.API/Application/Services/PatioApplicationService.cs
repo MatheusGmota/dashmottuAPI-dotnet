@@ -1,6 +1,6 @@
-﻿using dashmottu.API.Application.Interfaces;
+﻿using dashmottu.API.Application.DTOs;
+using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Application.Mappers;
-using dashmottu.API.Domain.DTOs;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
 using System.Net;
@@ -67,6 +67,24 @@ namespace dashmottu.API.Application.Services
             catch (Exception ex)
             {
                 return OperationResult<PatioResponse?>.Failure("Erro ao editar pátio.");
+            }
+        }
+
+        public async Task<OperationResult<PageResultModel<PatioComMotosResponse?>>> ObterMotos(int IdPatio, int deslocamento, int limite)
+        {
+            try
+            {
+                var result = await _repository.ObterMotos(IdPatio, deslocamento, limite);
+
+                if (result.Data is null) return OperationResult<PageResultModel<PatioComMotosResponse?>>.Failure("Pátio não encontrado");
+
+                if (!result.Data.Motos.Any()) return OperationResult<PageResultModel<PatioComMotosResponse?>>.Failure("Não existe conteúdo para motos");
+
+                return OperationResult<PageResultModel<PatioComMotosResponse?>>.Success(result);
+            } 
+            catch (Exception ex)
+            {
+                return OperationResult<PageResultModel<PatioComMotosResponse?>>.Failure("Erro ao obter motos.");
             }
         }
 

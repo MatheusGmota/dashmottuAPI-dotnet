@@ -1,7 +1,7 @@
-﻿using dashmottu.API.Domain.DTOs;
+﻿using dashmottu.API.Application.DTOs;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace dashmottu.API.Doc.Samples
+namespace dashmottu.API.Doc.PatioSamples
 {
     public class PatioResponseListSample : IExamplesProvider<IEnumerable<PatioResponse>>
     {
