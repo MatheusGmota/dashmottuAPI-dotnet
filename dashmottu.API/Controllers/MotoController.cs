@@ -1,9 +1,10 @@
 ﻿using dashmottu.API.Application.DTOs;
 using dashmottu.API.Application.Interfaces;
+using dashmottu.API.Doc.Samples;
+using dashmottu.API.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
-
 namespace dashmottu.API.Controllers
 {
     [ApiController]
@@ -17,8 +18,12 @@ namespace dashmottu.API.Controllers
         }
 
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ObterPorId(int id)
+        [HttpPost]
+        [SwaggerOperation(Summary= "Adicionar uma nova moto", Description = "Adiciona uma nova moto ao sistema.")]
+        [SwaggerRequestExample(typeof(MotoRequest), typeof(MotoRequestSample))]
+        [SwaggerResponse(201, "Pátio criado com sucesso.", typeof(MotoResponse))]
+        [SwaggerResponseExample(statusCode: 201, typeof(MotoResponseSample))]
+        public async Task<IActionResult> Adicionar([FromBody] MotoRequest moto)
         {
             var resultado = await _applicationService.ObterPorId(id);
             if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
@@ -28,29 +33,13 @@ namespace dashmottu.API.Controllers
             return StatusCode(resultado.StatusCode, resultado.Value);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ObterTodos([FromQuery] int Deslocamento = 0, [FromQuery] int Limite = 10)
-        {
-            var resultado = await _applicationService.ObterTodos(Deslocamento, Limite);
-            if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
-
-            var hateoas = resultado.Value.Data.Select(obj =>
-            {
-                GerarLinks(obj);
-                return obj;
-            });
-            return StatusCode(resultado.StatusCode, hateoas);
-        }
-
-        [HttpPost("{idPatio}")]
-        [SwaggerOperation(
-            Summary = "Adicionar uma nova moto a um pátio",
-            Description = "Adiciona uma nova moto a um pátio existente com base no ID do pátio fornecido."
-        )]
-        //[SwaggerRequestExample(typeof(MotoRequest), typeof(MotoRequestSample))]
-        [SwaggerResponse(201, "Moto adicionada com sucesso.", typeof(PatioComMotosResponse))]
-        //[SwaggerResponseExample(statusCode: 201, typeof(PatioComMotosResponseSample))]
-        public async Task<IActionResult> AdicionarMoto(int idPatio, [FromBody] MotoRequest novaMoto)
+        [HttpPut("{id}")]
+        [SwaggerOperation(Summary = "Atualizar uma moto", Description = "Atualiza os detalhes de uma moto existente.")]
+        [SwaggerResponse(200, "Moto atualizada com sucesso.", typeof(MotoResponse))]
+        [SwaggerResponse(404, "Moto não encontrada.")]
+        [SwaggerResponseExample(statusCode: 200, typeof(MotoResponseSample))]
+        [SwaggerRequestExample(typeof(MotoRequest), typeof(MotoRequestSample))]
+        public async Task<IActionResult> Atualizar(int id, [FromBody] MotoRequest moto)
         {
             var resultado = await _applicationService.AdicionarMotoNoPatio(idPatio, novaMoto);
 
@@ -59,10 +48,12 @@ namespace dashmottu.API.Controllers
             return StatusCode(resultado.StatusCode, resultado.Value);
         }
 
-
-        [HttpPost]
-        [SwaggerOperation(Summary= "Adicionar uma nova moto", Description = "Adiciona uma nova moto ao sistema.")]
-        public async Task<IActionResult> Adicionar([FromBody] MotoRequest moto)
+        [HttpGet("{id}")]
+        [SwaggerOperation(Summary = "Obter moto por ID", Description = "Obtém os detalhes de uma moto específica pelo seu ID.")]
+        [SwaggerResponse(200, "Moto encontrada com sucesso.", typeof(MotoResponse))]
+        [SwaggerResponse(404, "Moto não encontrada.")]
+        [SwaggerResponseExample(statusCode: 200, typeof(MotoResponseSample))]
+        public async Task<IActionResult> ObterPorId(int id)
         {
             var resultado = await _applicationService.Adicionar(moto);
             if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
@@ -72,8 +63,12 @@ namespace dashmottu.API.Controllers
             return StatusCode(resultado.StatusCode, resultado.Value);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Atualizar(int id, [FromBody] MotoRequest moto)
+        [HttpGet]
+        [SwaggerOperation(Summary = "Obter todas as motos", Description = "Obtém uma lista paginada de todas as motos.")]
+        [SwaggerResponse(200, "Lista de motos obtida com sucesso.", typeof(IEnumerable<MotoResponse>))]
+        [SwaggerResponseExample(statusCode: 200, typeof(MotoResponseListSample))]
+        [SwaggerRequestExample(typeof(MotoRequest), typeof(MotoRequestSample))]
+        public async Task<IActionResult> ObterTodos([FromQuery] int Deslocamento = 0, [FromQuery] int Limite = 10)
         {
             var resultado = await _applicationService.Atualizar(id, moto);
             if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
@@ -82,6 +77,10 @@ namespace dashmottu.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Deletar uma moto", Description = "Remove uma moto do sistema pelo seu ID.")]
+        [SwaggerResponse(200, "Moto deletada com sucesso.", typeof(MotoResponse))]
+        [SwaggerResponse(404, "Moto não encontrada.")]
+        [SwaggerResponseExample(statusCode: 200, typeof(MotoResponseSample))]
         public async Task<IActionResult> Deletar(int id)
         {
             var resultado = await _applicationService.Deletar(id);
