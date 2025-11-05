@@ -3,13 +3,17 @@ using dashmottu.API.Application.Services;
 using dashmottu.API.Domain.Interfaces;
 using dashmottu.API.Infrastructure.Data.AppData;
 using dashmottu.API.Infrastructure.Data.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Revisao.Infra.Data.HealthCheck;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +62,25 @@ builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live" }) //Liveness
     .AddCheck<OracleHealthCheck>("oracle_query", tags: new[] { "ready" }); //Readness
 
+var key = Encoding.ASCII.GetBytes(builder.Configuration["Secretkey"]!.ToString());
+
+builder.Services.AddAuthentication(options => {
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //oAuth
+})
+.AddJwtBearer(x => {
+    x.RequireHttpsMetadata = false; //Em produção é true
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false, //oAuth
+        ValidateAudience = false, //oAuth
+    };
+});
+
+
 
 builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 {
@@ -75,6 +98,26 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
     c.EnableAnnotations();
     c.ExampleFilters();
+    var securitySchema = new OpenApiSecurityScheme
+    {
+        Description = "Using the Authorization header with the Bearer scheme.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+        }
+    };
+    c.AddSecurityDefinition("Bearer", securitySchema);
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { securitySchema, new[] { "Bearer" } }
+    });
+
 });
 
 builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
@@ -93,6 +136,8 @@ app.UseResponseCompression();
 app.UseRateLimiter();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -1,6 +1,7 @@
 ﻿using dashmottu.API.Application.DTOs;
 using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Doc.PatioSamples;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
@@ -8,6 +9,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace dashmottu.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class PatioController : Controller

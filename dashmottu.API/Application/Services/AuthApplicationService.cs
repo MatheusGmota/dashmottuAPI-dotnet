@@ -3,7 +3,12 @@ using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Application.Mappers;
 using dashmottu.API.Domain.Entities;
 using dashmottu.API.Domain.Interfaces;
+using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
+using System.Text;
 
 namespace dashmottu.API.Application.Services
 {
@@ -11,8 +16,11 @@ namespace dashmottu.API.Application.Services
     {
         private readonly ILoginRepository _loginRepository;
 
-        public AuthApplicationService(ILoginRepository loginRepository)
+        private readonly IConfiguration _configuration;
+
+        public AuthApplicationService(ILoginRepository loginRepository, IConfiguration configuration)
         {
+            _configuration = configuration;
             _loginRepository = loginRepository;
         }
 
@@ -24,7 +32,7 @@ namespace dashmottu.API.Application.Services
 
                 if (result is null) return OperationResult<LoginResponseDto?>.Failure("Erro ao adicionar");
 
-                var response = new LoginResponseDto(result.ToDto(), true, idPatio, GenerateToken(idPatio));
+                var response = new LoginResponseDto(result.ToDto(), true, idPatio, GenerateToken(result));
 
                 return OperationResult<LoginResponseDto?>.Success(response, (int)HttpStatusCode.Created);
             }
@@ -77,7 +85,7 @@ namespace dashmottu.API.Application.Services
                 if (result is null)
                     return OperationResult<LoginResponseDto?>.Success(new LoginResponseDto(null, false, null, null), (int)HttpStatusCode.Unauthorized);
 
-                return OperationResult<LoginResponseDto?>.Success(new LoginResponseDto(result.ToDto(), true, result.PatioId, GenerateToken(result.PatioId)));
+                return OperationResult<LoginResponseDto?>.Success(new LoginResponseDto(result.ToDto(), true, result.PatioId, GenerateToken(result)));
             }
             catch (Exception)
             {
@@ -98,11 +106,25 @@ namespace dashmottu.API.Application.Services
                 return OperationResult<LoginDto?>.Failure("Erro ao obter login");
             }
         }
-        private string GenerateToken(int id)
+        private string GenerateToken(LoginEntity data)
         {
-            var rawToken = $"{id}-{DateTime.UtcNow.Ticks}-{Guid.NewGuid()}";
-            var tokenBytes = System.Text.Encoding.UTF8.GetBytes(rawToken);
-            return Convert.ToBase64String(tokenBytes);
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var key = Encoding.ASCII.GetBytes(_configuration["Secretkey"]!.ToString());
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Expires = DateTime.UtcNow.AddHours(8),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Subject = new ClaimsIdentity(new Claim[] {
+                    new Claim(ClaimTypes.Name, data!.Usuario.ToString()),
+                    new Claim(ClaimTypes.Role, data!.Role.ToString()),
+                    new Claim("Teste", "ValorTeste"),
+                 })
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
     }
 }

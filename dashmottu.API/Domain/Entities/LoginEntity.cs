@@ -21,6 +21,10 @@ namespace dashmottu.API.Domain.Entities
         [Column("SENHA")]
         public string Senha { get; set; }
 
+        [Required]
+        [Column("Role")]
+        public string Role { get; set; }
+
         [Column("ID_PATIO")]
         public int PatioId { get; set; }
 

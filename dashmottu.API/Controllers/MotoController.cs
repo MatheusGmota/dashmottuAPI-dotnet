@@ -1,12 +1,13 @@
 ﻿using dashmottu.API.Application.DTOs;
 using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Doc.Samples;
-using dashmottu.API.Domain.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 namespace dashmottu.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("/api/[controller]")]
     public class MotoController : Controller
@@ -19,13 +20,13 @@ namespace dashmottu.API.Controllers
 
 
         [HttpPost]
-        [SwaggerOperation(Summary= "Adicionar uma nova moto", Description = "Adiciona uma nova moto ao sistema.")]
+        [SwaggerOperation(Summary = "Adicionar uma nova moto", Description = "Adiciona uma nova moto ao sistema.")]
         [SwaggerRequestExample(typeof(MotoRequest), typeof(MotoRequestSample))]
         [SwaggerResponse(201, "Pátio criado com sucesso.", typeof(MotoResponse))]
         [SwaggerResponseExample(statusCode: 201, typeof(MotoResponseSample))]
         public async Task<IActionResult> Adicionar([FromBody] MotoRequest moto)
         {
-            var resultado = await _applicationService.ObterPorId(id);
+            var resultado = await _applicationService.Adicionar(moto);
             if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
             GerarLinks(resultado.Value);
@@ -41,8 +42,19 @@ namespace dashmottu.API.Controllers
         [SwaggerRequestExample(typeof(MotoRequest), typeof(MotoRequestSample))]
         public async Task<IActionResult> Atualizar(int id, [FromBody] MotoRequest moto)
         {
-            var resultado = await _applicationService.AdicionarMotoNoPatio(idPatio, novaMoto);
+            var resultado = await _applicationService.Atualizar(id, moto);
+            if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
+            return StatusCode(resultado.StatusCode, resultado.Value);
+        }
+
+        [HttpPost("patio/{idPatio}")]
+        [SwaggerOperation(Summary = "Adicionar moto no pátio", Description = "Adiciona uma moto a um pátio específico.")]
+        [SwaggerResponse(201, "Moto adicionada ao pátio com sucesso.", typeof(MotoWithXAndYResponse))]
+        [SwaggerRequestExample(typeof(MotoRequest), typeof(MotoRequestSample))]
+        public async Task<IActionResult> AtualizarMotoNoPatio(int idPatio, [FromBody] MotoRequest moto)
+        {
+            var resultado = await _applicationService.AdicionarMotoNoPatio(idPatio, moto);
             if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
             return StatusCode(resultado.StatusCode, resultado.Value);
@@ -55,7 +67,7 @@ namespace dashmottu.API.Controllers
         [SwaggerResponseExample(statusCode: 200, typeof(MotoResponseSample))]
         public async Task<IActionResult> ObterPorId(int id)
         {
-            var resultado = await _applicationService.Adicionar(moto);
+            var resultado = await _applicationService.ObterPorId(id);
             if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
             GerarLinks(resultado.Value);
@@ -70,10 +82,15 @@ namespace dashmottu.API.Controllers
         [SwaggerRequestExample(typeof(MotoRequest), typeof(MotoRequestSample))]
         public async Task<IActionResult> ObterTodos([FromQuery] int Deslocamento = 0, [FromQuery] int Limite = 10)
         {
-            var resultado = await _applicationService.Atualizar(id, moto);
+            var resultado = await _applicationService.ObterTodos(Deslocamento, Limite);
             if (!resultado.IsSuccess) return StatusCode(resultado.StatusCode, resultado.Error);
 
-            return StatusCode(resultado.StatusCode, resultado.Value);
+            var hateoas = resultado.Value.Data.Select(obj =>
+            {
+                GerarLinks(obj);
+                return obj;
+            });
+            return StatusCode(resultado.StatusCode, hateoas);
         }
 
         [HttpDelete("{id}")]
@@ -91,7 +108,8 @@ namespace dashmottu.API.Controllers
             return StatusCode(resultado.StatusCode, resultado.Value);
         }
 
-        private void GerarLinks(MotoResponse? obj)
+
+        private void GerarLinks(MotoResponse obj)
         {
             obj.Links = new LinkDto(
                 Url.Action(nameof(ObterPorId), "Moto", new { id = obj.Id }, Request.Scheme),

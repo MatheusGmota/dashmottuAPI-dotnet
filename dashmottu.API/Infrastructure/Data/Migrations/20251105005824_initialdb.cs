@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace dashmottu.API.Infrastructure.Data.Migrations
+namespace dashmottu.API.Migrations
 {
     /// <inheritdoc />
-    public partial class Incial : Migration
+    public partial class initialdb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -56,6 +56,7 @@ namespace dashmottu.API.Infrastructure.Data.Migrations
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
                     USUARIO = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
                     SENHA = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
+                    Role = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
                     ID_PATIO = table.Column<int>(type: "NUMBER(10)", nullable: false)
                 },
                 constraints: table =>

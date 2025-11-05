@@ -9,11 +9,11 @@ using dashmottu.API.Infrastructure.Data.AppData;
 
 #nullable disable
 
-namespace dashmottu.API.Infrastructure.Data.Migrations
+namespace dashmottu.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250924204530_Incial")]
-    partial class Incial
+    [Migration("20251105005824_initialdb")]
+    partial class initialdb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,6 +87,11 @@ namespace dashmottu.API.Infrastructure.Data.Migrations
                     b.Property<int>("PatioId")
                         .HasColumnType("NUMBER(10)")
                         .HasColumnName("ID_PATIO");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("Role");
 
                     b.Property<string>("Senha")
                         .IsRequired()

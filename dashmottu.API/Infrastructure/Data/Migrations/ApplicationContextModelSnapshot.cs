@@ -8,7 +8,7 @@ using dashmottu.API.Infrastructure.Data.AppData;
 
 #nullable disable
 
-namespace dashmottu.API.Infrastructure.Data.Migrations
+namespace dashmottu.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
     partial class ApplicationContextModelSnapshot : ModelSnapshot
@@ -84,6 +84,11 @@ namespace dashmottu.API.Infrastructure.Data.Migrations
                     b.Property<int>("PatioId")
                         .HasColumnType("NUMBER(10)")
                         .HasColumnName("ID_PATIO");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("Role");
 
                     b.Property<string>("Senha")
                         .IsRequired()
