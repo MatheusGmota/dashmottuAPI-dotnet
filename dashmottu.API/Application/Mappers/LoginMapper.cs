@@ -13,6 +13,15 @@ namespace dashmottu.API.Application.Mappers
                 Senha = obj.Senha
             };
         }
+        public static LoginEntity ToEntity(this LoginRequestDto obj)
+        {
+            return new LoginEntity
+            {
+                Usuario = obj.Usuario,
+                Senha = obj.Senha,
+                Role = obj.Role
+            };
+        }
 
         public static LoginDto ToDto(this LoginEntity entity)
         {

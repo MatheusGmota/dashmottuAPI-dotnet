@@ -26,7 +26,8 @@ namespace dashmottu.API.Domain.Entities
         public string Role { get; set; }
 
         [Column("ID_PATIO")]
-        public int PatioId { get; set; }
+       
+        public int? PatioId { get; set; }
 
         [JsonIgnore]
         public PatioEntity Patio { get; set; }

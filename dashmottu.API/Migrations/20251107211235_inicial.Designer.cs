@@ -12,8 +12,8 @@ using dashmottu.API.Infrastructure.Data.AppData;
 namespace dashmottu.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20251105005824_initialdb")]
-    partial class initialdb
+    [Migration("20251107211235_inicial")]
+    partial class inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,7 +84,7 @@ namespace dashmottu.API.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("PatioId")
+                    b.Property<int?>("PatioId")
                         .HasColumnType("NUMBER(10)")
                         .HasColumnName("ID_PATIO");
 
@@ -106,7 +106,8 @@ namespace dashmottu.API.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PatioId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"ID_PATIO\" IS NOT NULL");
 
                     b.HasIndex("Usuario")
                         .IsUnique();
@@ -196,9 +197,7 @@ namespace dashmottu.API.Migrations
                 {
                     b.HasOne("dashmottu.API.Domain.Entities.PatioEntity", "Patio")
                         .WithOne("Login")
-                        .HasForeignKey("dashmottu.API.Domain.Entities.LoginEntity", "PatioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("dashmottu.API.Domain.Entities.LoginEntity", "PatioId");
 
                     b.Navigation("Patio");
                 });

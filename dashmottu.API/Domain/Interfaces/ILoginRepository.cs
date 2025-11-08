@@ -4,7 +4,7 @@ namespace dashmottu.API.Domain.Interfaces
 {
     public interface ILoginRepository
     {
-        Task<LoginEntity?> Adicionar(int idPatio, LoginEntity login);
+        Task<LoginEntity?> Adicionar(int? idPatio, LoginEntity login);
         Task<LoginEntity?> Atualizar(int idPatio, LoginEntity login);
         Task<LoginEntity?> Deletar(int idPatio);
         Task<LoginEntity?> ObterPorId(int id);

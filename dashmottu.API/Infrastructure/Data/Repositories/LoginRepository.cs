@@ -14,26 +14,25 @@ namespace dashmottu.API.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public async Task<LoginEntity?> Adicionar(int idPatio, LoginEntity login)
+        public async Task<LoginEntity?> Adicionar(int? idPatio, LoginEntity login)
         {
-            var patio = await _context.Patio.FirstOrDefaultAsync(x => x.Id == idPatio);
-
-            if (patio is not null)
+            Console.WriteLine("Adicionando login para o pátio ID: " + idPatio);
+            if (idPatio is not null || idPatio != 0)
             {
-                login.PatioId = idPatio;
-
-                //Verificar se ja existe um login para o patio
-                var existingLogin = await _context.Login.FirstOrDefaultAsync(l => l.Usuario == login.Usuario);
-                if (existingLogin is not null)
-                    //Lancar exception personalizada de usuario existente
+                var patio = await _context.Patio.FirstOrDefaultAsync(x => x.Id == idPatio);
+                if (patio == null)
                     return null;
-
-                _context.Login.Add(login);
-                await _context.SaveChangesAsync();  
-
-                return login;
+                login.PatioId = idPatio;
             }
-            return null;
+
+            //Verificar se ja existe um login para o patio
+            var existingLogin = await _context.Login.FirstOrDefaultAsync(l => l.Usuario == login.Usuario);
+            if (existingLogin is not null)
+                return null;
+            _context.Login.Add(login);
+            await _context.SaveChangesAsync();  
+
+            return login;
         }
 
         public async Task<LoginEntity?> Atualizar(int idPatio, LoginEntity login)

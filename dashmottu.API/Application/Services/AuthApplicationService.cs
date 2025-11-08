@@ -24,7 +24,7 @@ namespace dashmottu.API.Application.Services
             _loginRepository = loginRepository;
         }
 
-        public async Task<OperationResult<LoginResponseDto?>> Adicionar(int idPatio, LoginDto entidade)
+        public async Task<OperationResult<LoginResponseDto?>> Adicionar(int? idPatio, LoginRequestDto entidade)
         {
             try
             {
@@ -36,8 +36,6 @@ namespace dashmottu.API.Application.Services
 
                 return OperationResult<LoginResponseDto?>.Success(response, (int)HttpStatusCode.Created);
             }
-            //TODO: Implementar exception personalizada pra usuario existente
-            // catch (UsuarioExistenteException ex) {}
             catch (Exception ex)
             {
                 return OperationResult<LoginResponseDto?>.Failure(ex.Message);

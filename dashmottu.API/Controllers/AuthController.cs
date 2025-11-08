@@ -1,6 +1,7 @@
 ﻿using dashmottu.API.Application.DTOs;
 using dashmottu.API.Application.Interfaces;
 using dashmottu.API.Doc.LoginSamples;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
@@ -26,6 +27,7 @@ namespace dashmottu.API.Controllers
         [SwaggerResponse(200, "Login retornado com sucesso", typeof(LoginResponseDto))]
         [SwaggerResponse(204, "Nenhum login encontrado.")]
         [SwaggerResponseExample(statusCode: 200, typeof(LoginResponseSample))]
+        [AllowAnonymous]
         public async Task<IActionResult> ObterPorId(int idPatio)
         {
             var resultado = await _applicationService.ObterLoginPorId(idPatio);
@@ -38,10 +40,10 @@ namespace dashmottu.API.Controllers
             Summary = "Cadastro do login do pátio",
             Description = "Realiza o cadastro das credenciais de login de um patio."
         )]
-        [SwaggerRequestExample(typeof(LoginDto), typeof(LoginRequestSample))]
+        [SwaggerRequestExample(typeof(LoginRequestDto), typeof(LoginRequestCreateSample))]
         [SwaggerResponse(201, "Login cadastrado com sucesso", typeof(LoginResponseDto))]
         [SwaggerResponseExample(statusCode: 201, typeof(LoginResponseSample))]
-        public async Task<IActionResult> Criar([FromQuery] int idPatio,[FromBody] LoginDto login)
+        public async Task<IActionResult> Criar([FromQuery] int? idPatio,[FromBody] LoginRequestDto login)
         {
             var result = await _applicationService.Adicionar(idPatio, login);
 

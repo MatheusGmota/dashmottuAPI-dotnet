@@ -5,7 +5,7 @@
 namespace dashmottu.API.Migrations
 {
     /// <inheritdoc />
-    public partial class initialdb : Migration
+    public partial class inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -57,7 +57,7 @@ namespace dashmottu.API.Migrations
                     USUARIO = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
                     SENHA = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
                     Role = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    ID_PATIO = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                    ID_PATIO = table.Column<int>(type: "NUMBER(10)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -66,8 +66,7 @@ namespace dashmottu.API.Migrations
                         name: "FK_LOGIN_PATIO_ID_PATIO",
                         column: x => x.ID_PATIO,
                         principalTable: "PATIO",
-                        principalColumn: "ID_PATIO",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID_PATIO");
                 });
 
             migrationBuilder.CreateTable(
@@ -104,7 +103,8 @@ namespace dashmottu.API.Migrations
                 name: "IX_LOGIN_ID_PATIO",
                 table: "LOGIN",
                 column: "ID_PATIO",
-                unique: true);
+                unique: true,
+                filter: "\"ID_PATIO\" IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LOGIN_USUARIO",
