@@ -118,6 +118,8 @@ dotnet run
 #### ❌ Deletar pátio
 `DELETE /api/patio/1`
 
+--- 
+
 ### 🚀 **AuthController**
 
 #### 🔎 Obter login por ID do pátio
@@ -152,6 +154,26 @@ dotnet run
 
 #### ❌ Deletar login
 `DELETE /api/auth?idPatio=1` 
+
+--- 
+### 🚀 **HealthController**
+  Endpoint criado para verificar os status da nossa api
+#### 🔎 Liveness (o processo está vivo?)
+`GET /api/Health/live` 
+
+- Objetivo: detectar travamentos/loops ou deadlocks no processo da API.
+- Ação típica do orquestrador: reiniciar o container quando unhealthy.
+- Exemplos: responder “OK”/200, verificar thread pool/heap básico, “self check”.  
+
+
+#### 🔎 Readiness (a instância está pronta para tráfego?)
+`GET /api/Health/read` 
+
+- Objetivo: garantir que a instância pode atender requisições de negócio.
+- Ação típica do orquestrador/Load Balancer: anexar/desanexar do pool de tráfego conforme Healthy/Unhealthy.
+- Exemplos: ping leve ao banco, teste de cache, verificação de filas/credenciais.
+
+---
 
 ### Teste Unitários
 Para executar testes individuais ou todos de uma vez, basta clicar com o botão direito em um teste ou no menu Teste > Gerenciador de Testes (ou `Ctrl+E, T`). Irá abrir uma caixa com os teste, só clicar em executar.
