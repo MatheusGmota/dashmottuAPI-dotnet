@@ -164,7 +164,18 @@ dotnet run
 - Objetivo: detectar travamentos/loops ou deadlocks no processo da API.
 - Ação típica do orquestrador: reiniciar o container quando unhealthy.
 - Exemplos: responder “OK”/200, verificar thread pool/heap básico, “self check”.  
-
+```
+{
+  "status": "Healthy",
+  "checks": [
+    {
+      "name": "self",
+      "status": "Healthy",
+      "description": null,
+      "error": null
+    }
+  ]
+```
 
 #### 🔎 Readiness (a instância está pronta para tráfego?)
 `GET /api/Health/read` 
@@ -172,6 +183,19 @@ dotnet run
 - Objetivo: garantir que a instância pode atender requisições de negócio.
 - Ação típica do orquestrador/Load Balancer: anexar/desanexar do pool de tráfego conforme Healthy/Unhealthy.
 - Exemplos: ping leve ao banco, teste de cache, verificação de filas/credenciais.
+```
+{
+  "status": "Healthy",
+  "checks": [
+    {
+      "name": "oracle_query",
+      "status": "Healthy",
+      "description": "Banco de dados esta online",
+      "error": null
+    }
+  ]
+}
+```
 
 ---
 
