@@ -104,7 +104,7 @@ namespace dashmottu.API.Application.Services
             }
         }
 
-        public async Task<OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>> ObterTodosPatios(int deslocamento, int limite)
+        public async Task<OperationResult<PageResultModel<IEnumerable<PatioResponse?>>>> ObterTodosPatios(int deslocamento = 1, int limite = 5)
         {
             try
             {
