@@ -153,6 +153,11 @@ dotnet run
 #### ❌ Deletar login
 `DELETE /api/auth?idPatio=1` 
 
+### Teste Unitários
+Para executar testes individuais ou todos de uma vez, basta clicar com o botão direito em um teste ou no menu Teste > Gerenciador de Testes (ou `Ctrl+E, T`). Irá abrir uma caixa com os teste, só clicar em executar.
+<img width="1400" height="718" alt="image" src="https://github.com/user-attachments/assets/dc4f8954-6b10-4479-8e00-dd9f2fed1879" />
+
+
 ### 📚 Documentação Interativa
 - Ao executar a API, acesse a documentação Swagger digitando `/swagger` para testar os endpoints diretamente pelo navegador.
 
